@@ -86,12 +86,21 @@ function QuestObjectiveItem_OnEnter(self)
 	GameTooltip:SetQuestLogSpecialItem(self:GetID());
 end
 
-function QuestObjectiveItem_OnClick(self, button)
+---@class ItemButton
+---@field link any
+---@field item integer
+
+---@param self ItemButton
+function QuestObjectiveItem_OnClick(self)
 	if ( IsModifiedClick("CHATLINK") and ChatEdit_GetActiveWindow() ) then
-		local link, item, charges, showItemWhenComplete = GetQuestLogSpecialItemInfo(self:GetID());
+		local link = GetQuestLogSpecialItemInfo(self:GetID());
 		if ( link ) then
 			ChatEdit_InsertLink(link);
 		end
+	else
+		print("Using => " .. self.link)
+		UseQuestLogSpecialItem(self.item)
+		print("Item successfully used !")
 	end
 end
 
