@@ -20,19 +20,30 @@ function QuestObjectiveItem_ReleaseButton(button)
 end
 
 function QuestObjectiveItem_Initialize(itemButton, questLogIndex)
-	local link, item, charges, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex);
+	local link, iconID, charges, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex);
 	itemButton:SetID(questLogIndex);
 	itemButton.link = link;
 	itemButton.charges = charges;
 	itemButton.rangeTimer = -1;
-	SetItemButtonTexture(itemButton, item);
+	SetItemButtonTexture(itemButton, iconID);
 	SetItemButtonCount(itemButton, charges);
+
+	print("Bind button to type item and item link => " .. link)
+	itemButton:SetAttribute("type*","item")
+	itemButton:SetAttribute("item", itemButton.link)
+	itemButton.item = itemButton.link;
+
+	print("Item link => " .. itemButton:GetAttribute("type*"));
+
+	PrintDump(itemButton, 1)
+	
 	QuestObjectiveItem_UpdateCooldown(itemButton);
+
 end
 
-function QuestObjectiveItem_OnLoad(self)
-	self:RegisterForClicks("AnyUp");
-end
+-- function QuestObjectiveItem_OnLoad(self)
+-- 	self:RegisterForClicks("AnyUp");
+-- end
 
 function QuestObjectiveItem_OnEvent(self, event, ...)
 	if ( event == "PLAYER_TARGET_CHANGED" ) then
@@ -86,21 +97,45 @@ function QuestObjectiveItem_OnEnter(self)
 	GameTooltip:SetQuestLogSpecialItem(self:GetID());
 end
 
----@class ItemButton
----@field link any
----@field item integer
+function Dump(object, time, max)
+	if type(object) == 'table' then
+		if(time > max) then return "TABLE" end
 
----@param self ItemButton
-function QuestObjectiveItem_OnClick(self)
+		local s = '{ '
+      for k,v in pairs(object) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. Dump(v, time + 1, max) .. ','
+      end
+      return s .. '} '
+   else
+		return tostring(object)
+   end
+end
+
+function PrintDump(object, depth)
+	print(Dump(object, 0, depth))
+end
+
+--- It doesn't work because the "UseQuestLogSpecialItem" WoW function is bugged on this version :
+--- It "taints" (modify) the C code on execution so it needs a workaround.
+--- The bug is well known.
+--- https://warcraft.wiki.gg/wiki/SecureActionButtonTemplate
+---@param button Button
+---@param mouseButton string
+function QuestObjectiveItem_OnClick(button, mouseButton)
+	print("Time UTC => " .. time())
+	print("Click using button => " .. mouseButton);
+	-- print("UseItemByName => " .. button.item);
+	-- C_Item.UseItemByName(button.item)
+	PrintDump(button, 1)
+
 	if ( IsModifiedClick("CHATLINK") and ChatEdit_GetActiveWindow() ) then
-		local link = GetQuestLogSpecialItemInfo(self:GetID());
+		local link = GetQuestLogSpecialItemInfo(button:GetID());
 		if ( link ) then
 			ChatEdit_InsertLink(link);
 		end
 	else
-		print("Using => " .. self.link)
-		UseQuestLogSpecialItem(self.item)
-		print("Item successfully used !")
+		-- UseQuestLogSpecialItem(button:GetID());			-- Protected function
 	end
 end
 

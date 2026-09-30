@@ -3,7 +3,7 @@
 
 	<Script file="ObjectiveTrackerShared.lua"/>
 
-	<Button name="QuestObjectiveItemButtonTemplate" virtual="true">
+	<Button name="QuestObjectiveItemButtonTemplate" inherits="SecureActionButtonTemplate" virtual="true">
 		<Size x="26" y="26"/>
 		<Layers>
 			<Layer level="ARTWORK">
@@ -27,7 +27,7 @@
 			<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate"/>
 		</Frames>
 		<Scripts>
-			<OnLoad function="QuestObjectiveItem_OnLoad"/>
+			<!-- <OnLoad function="QuestObjectiveItem_OnLoad"/> -->
 			<OnEvent function="QuestObjectiveItem_OnEvent"/>
 			<OnUpdate function="QuestObjectiveItem_OnUpdate"/>
 			<OnShow function="QuestObjectiveItem_OnShow"/>
@@ -36,7 +36,7 @@
 			<OnLeave>
 				GameTooltip:Hide();
 			</OnLeave>
-			<OnClick function="QuestObjectiveItem_OnClick"/>
+			<!-- <OnClick function="QuestObjectiveItem_OnClick"/> -->
 		</Scripts>
 		<NormalTexture parentKey="NormalTexture" file="Interface\Buttons\UI-Quickslot2">
 			<Size x="42" y="42"/>
@@ -46,6 +46,9 @@
 		</NormalTexture>
 		<PushedTexture file="Interface\Buttons\UI-Quickslot-Depress"/>
 		<HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+		<Attributes>
+			<Attribute name="type" value="item" />
+		</Attributes>
 	</Button>
 
 	<Button name="QuestObjectiveFindGroupButtonTemplate" motionScriptsWhileDisabled="true" virtual="true">

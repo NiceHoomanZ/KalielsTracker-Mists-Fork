@@ -164,7 +164,15 @@
         "HONOR",
         "BONUS_OBJECTIVE_REWARD_WITH_COUNT_FORMAT",
         "BONUS_OBJECTIVE_REWARD_FORMAT",
-        "DLAPI"
+        "DLAPI",
+        "SetItemRef",
+        "EnumUtil",
+        "GenerateClosure",
+        "ObjectiveTrackerFrame",
+        "QuestMapFrame_OpenToQuestDetails",
+        "ScenarioObjectiveTracker",
+        "AchievementObjectiveTracker",
+        "QuestObjectiveTracker"
     ],
     "Lua.type.weakUnionCheck": true
 }
