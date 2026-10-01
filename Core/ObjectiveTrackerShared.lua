@@ -1,3 +1,61 @@
+local Util = {}
+
+Util.FORMAT_itemid = "item:%d:0:0:0:0:0:0:0"
+Util.PATTERN_itemlink = "|c%x+|H"..Util.PATTERN_itemid.."|h%[.-%]|h|r"
+Util.PATTERN_itemid = "item:(%-?%d+):%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+"
+
+---@param object any
+---@param depth number
+---@param current number?
+function Util.Dump(object, depth, current)
+	if current == nil then current = 0 end
+
+	if type(object) == 'table' then
+		if(current > depth) then return "TABLE" end
+
+		local s = '{ '
+      for k,v in pairs(object) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. Util.Dump(v, depth, current + 1) .. ','
+      end
+      return s .. '} '
+   else
+		return tostring(object)
+   end
+end
+
+---@param object any
+---@param depth number?
+function Util.PrintDump(object, depth)
+	if depth == nil then depth = 1 end
+	print(Util.Dump(object, depth))
+end
+
+---From LibQuestItem addon
+---@param link any
+---@return number
+function Util.GetBaseId(link)
+	if link then
+		if type(link) == "number" then return link end
+		local baseid = strmatch(link, Util.PATTERN_itemlink)
+		if not baseid then
+			baseid = strmatch(link, Util.PATTERN_itemid)
+		end
+		if not baseid then
+			baseid = link
+		end
+		return tonumber(baseid)
+	end
+	return 0
+end
+
+---From LibQuestItem addon
+---@param itemId string|number
+---@return string
+function Util.GetItemString(itemId)
+	return string.format(Util.FORMAT_itemid, itemId)
+end
+
 -- *****************************************************************************************************
 -- ***** ITEM FUNCTIONS
 -- *****************************************************************************************************
@@ -20,7 +78,7 @@ function QuestObjectiveItem_ReleaseButton(button)
 end
 
 function QuestObjectiveItem_Initialize(itemButton, questLogIndex)
-	local link, iconID, charges, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex);
+	local link, iconID, charges = GetQuestLogSpecialItemInfo(questLogIndex);
 	itemButton:SetID(questLogIndex);
 	itemButton.link = link;
 	itemButton.charges = charges;
@@ -28,22 +86,41 @@ function QuestObjectiveItem_Initialize(itemButton, questLogIndex)
 	SetItemButtonTexture(itemButton, iconID);
 	SetItemButtonCount(itemButton, charges);
 
-	print("Bind button to type item and item link => " .. link)
-	itemButton:SetAttribute("type*","item")
-	itemButton:SetAttribute("item", itemButton.link)
-	itemButton.item = itemButton.link;
+	local itemId = Util.GetBaseId(link)
+	print("Item link => " .. (link or "Nil"))
+	print("Item id => " .. (itemId or "Nil"))
+	local item = Util.GetItemString(itemId)
+	print("Item => " .. (itemId or "Nil"))
+	itemButton:SetAttribute("item", item)
 
-	print("Item link => " .. itemButton:GetAttribute("type*"));
-
-	PrintDump(itemButton, 1)
+	print("Item after initial full initialisation")
+	print(itemButton:GetAttribute("item"))
 	
 	QuestObjectiveItem_UpdateCooldown(itemButton);
-
 end
 
--- function QuestObjectiveItem_OnLoad(self)
--- 	self:RegisterForClicks("AnyUp");
--- end
+function QuestObjectiveItem_OnLoad(self)
+	self:RegisterForClicks("AnyUp");
+end
+
+--- It doesn't work because the "UseQuestLogSpecialItem" WoW function is bugged on this version :
+--- It "taints" (modify) the C code on execution so it needs a workaround.
+--- The bug is well known.
+--- https://warcraft.wiki.gg/wiki/SecureActionButtonTemplate
+---@param button Button
+---@param mouseButton string
+function QuestObjectiveItem_OnClick(button, mouseButton)
+	if ( IsModifiedClick("CHATLINK") and ChatEdit_GetActiveWindow() ) then
+		local link = GetQuestLogSpecialItemInfo(button:GetID());
+		if ( link ) then
+			ChatEdit_InsertLink(link);
+		end
+	else
+		print("Time UTC => " .. time())
+		print("Click using button => " .. mouseButton);
+		-- UseQuestLogSpecialItem(button:GetID());			-- Protected function
+	end
+end
 
 function QuestObjectiveItem_OnEvent(self, event, ...)
 	if ( event == "PLAYER_TARGET_CHANGED" ) then
@@ -95,48 +172,6 @@ end
 function QuestObjectiveItem_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetQuestLogSpecialItem(self:GetID());
-end
-
-function Dump(object, time, max)
-	if type(object) == 'table' then
-		if(time > max) then return "TABLE" end
-
-		local s = '{ '
-      for k,v in pairs(object) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. Dump(v, time + 1, max) .. ','
-      end
-      return s .. '} '
-   else
-		return tostring(object)
-   end
-end
-
-function PrintDump(object, depth)
-	print(Dump(object, 0, depth))
-end
-
---- It doesn't work because the "UseQuestLogSpecialItem" WoW function is bugged on this version :
---- It "taints" (modify) the C code on execution so it needs a workaround.
---- The bug is well known.
---- https://warcraft.wiki.gg/wiki/SecureActionButtonTemplate
----@param button Button
----@param mouseButton string
-function QuestObjectiveItem_OnClick(button, mouseButton)
-	print("Time UTC => " .. time())
-	print("Click using button => " .. mouseButton);
-	-- print("UseItemByName => " .. button.item);
-	-- C_Item.UseItemByName(button.item)
-	PrintDump(button, 1)
-
-	if ( IsModifiedClick("CHATLINK") and ChatEdit_GetActiveWindow() ) then
-		local link = GetQuestLogSpecialItemInfo(button:GetID());
-		if ( link ) then
-			ChatEdit_InsertLink(link);
-		end
-	else
-		-- UseQuestLogSpecialItem(button:GetID());			-- Protected function
-	end
 end
 
 function QuestObjectiveItem_UpdateCooldown(itemButton)

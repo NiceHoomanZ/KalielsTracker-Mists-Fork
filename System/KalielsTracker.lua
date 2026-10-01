@@ -883,7 +883,7 @@ local function SetHooks()
 				button:SetScript("OnEnter", ScenarioSpellButton_OnEnter)
 				button:SetScript("OnLeave", GameTooltip_Hide)
 			end
-			--button:SetScript("OnMouseDown", QuestObjectiveItem_OnClick)
+			button:SetScript("OnMouseDown", QuestObjectiveItem_OnClick)
             button:SetAttribute("type*", isSpell and "spell" or "item")
 			button:Show()
 			KT.fixedButtons[questID] = button

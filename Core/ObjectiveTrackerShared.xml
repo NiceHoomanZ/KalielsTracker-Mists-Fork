@@ -27,7 +27,7 @@
 			<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate"/>
 		</Frames>
 		<Scripts>
-			<!-- <OnLoad function="QuestObjectiveItem_OnLoad"/> -->
+			<OnLoad function="QuestObjectiveItem_OnLoad"/>
 			<OnEvent function="QuestObjectiveItem_OnEvent"/>
 			<OnUpdate function="QuestObjectiveItem_OnUpdate"/>
 			<OnShow function="QuestObjectiveItem_OnShow"/>
@@ -36,7 +36,7 @@
 			<OnLeave>
 				GameTooltip:Hide();
 			</OnLeave>
-			<!-- <OnClick function="QuestObjectiveItem_OnClick"/> -->
+			<OnClick function="QuestObjectiveItem_OnClick"/>
 		</Scripts>
 		<NormalTexture parentKey="NormalTexture" file="Interface\Buttons\UI-Quickslot2">
 			<Size x="42" y="42"/>
