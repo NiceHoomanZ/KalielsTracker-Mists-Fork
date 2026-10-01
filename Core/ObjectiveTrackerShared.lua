@@ -1,8 +1,8 @@
 local Util = {}
 
 Util.FORMAT_itemid = "item:%d:0:0:0:0:0:0:0"
-Util.PATTERN_itemlink = "|c%x+|H"..Util.PATTERN_itemid.."|h%[.-%]|h|r"
 Util.PATTERN_itemid = "item:(%-?%d+):%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+"
+Util.PATTERN_itemlink = "|c%x+|H".. Util.PATTERN_itemid .."|h%[.-%]|h|r"
 
 ---@param object any
 ---@param depth number
@@ -31,7 +31,8 @@ function Util.PrintDump(object, depth)
 	print(Util.Dump(object, depth))
 end
 
----From LibQuestItem addon
+---From LibQuestItem addon 
+---Get BaseId from item link
 ---@param link any
 ---@return number
 function Util.GetBaseId(link)
@@ -50,10 +51,19 @@ function Util.GetBaseId(link)
 end
 
 ---From LibQuestItem addon
+---Get ItemString from baseId
 ---@param itemId string|number
 ---@return string
 function Util.GetItemString(itemId)
 	return string.format(Util.FORMAT_itemid, itemId)
+end
+
+---Format link to be able to print its real data
+---@param link string|unknown
+---@return string
+function Util.FormatLink(link)
+	local formattedString = gsub(link, "\124", "\124\124");
+	return formattedString;
 end
 
 -- *****************************************************************************************************
@@ -77,6 +87,7 @@ function QuestObjectiveItem_ReleaseButton(button)
 	g_questObjectiveItemPool:Release(button);
 end
 
+
 function QuestObjectiveItem_Initialize(itemButton, questLogIndex)
 	local link, iconID, charges = GetQuestLogSpecialItemInfo(questLogIndex);
 	itemButton:SetID(questLogIndex);
@@ -86,16 +97,18 @@ function QuestObjectiveItem_Initialize(itemButton, questLogIndex)
 	SetItemButtonTexture(itemButton, iconID);
 	SetItemButtonCount(itemButton, charges);
 
-	local itemId = Util.GetBaseId(link)
-	print("Item link => " .. (link or "Nil"))
-	print("Item id => " .. (itemId or "Nil"))
-	local item = Util.GetItemString(itemId)
-	print("Item => " .. (itemId or "Nil"))
-	itemButton:SetAttribute("item", item)
+	local formattedLink = Util.FormatLink(link)
+	local baseId = Util.GetBaseId(formattedLink)
+	local itemString = Util.GetItemString(baseId)
 
-	print("Item after initial full initialisation")
-	print(itemButton:GetAttribute("item"))
-	
+	print("Link => " .. (link or "Nil") ..
+	" formattedLink => " .. (formattedLink or "Nil") ..
+	" BaseId => " .. (baseId or "Nil") ..
+	" ItemString => " .. (itemString or "Nil"))
+
+	itemButton:SetAttribute("item", itemString)
+	print("Item after initial full initialisation => " .. (itemButton:GetAttribute("item") or "Nil"))
+
 	QuestObjectiveItem_UpdateCooldown(itemButton);
 end
 
