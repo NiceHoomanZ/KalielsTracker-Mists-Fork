@@ -3,7 +3,8 @@
 
 	<Script file="ObjectiveTrackerShared.lua"/>
 
-	<Button name="QuestObjectiveItemButtonTemplate" inherits="SecureActionButtonTemplate" virtual="true">
+	<!-- inherits="SecureActionButtonTemplate" -->
+	<Button name="QuestObjectiveItemButtonTemplate" virtual="true">
 		<Size x="26" y="26"/>
 		<Layers>
 			<Layer level="ARTWORK">

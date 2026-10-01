@@ -87,7 +87,9 @@ function QuestObjectiveItem_ReleaseButton(button)
 	g_questObjectiveItemPool:Release(button);
 end
 
-
+---Set the button icon, charges, rangeTimer, count, item
+---@param itemButton Button|unknown
+---@param questLogIndex number
 function QuestObjectiveItem_Initialize(itemButton, questLogIndex)
 	local link, iconID, charges = GetQuestLogSpecialItemInfo(questLogIndex);
 	itemButton:SetID(questLogIndex);
@@ -97,17 +99,8 @@ function QuestObjectiveItem_Initialize(itemButton, questLogIndex)
 	SetItemButtonTexture(itemButton, iconID);
 	SetItemButtonCount(itemButton, charges);
 
-	local formattedLink = Util.FormatLink(link)
-	local baseId = Util.GetBaseId(formattedLink)
-	local itemString = Util.GetItemString(baseId)
-
-	print("Link => " .. (link or "Nil") ..
-	" formattedLink => " .. (formattedLink or "Nil") ..
-	" BaseId => " .. (baseId or "Nil") ..
-	" ItemString => " .. (itemString or "Nil"))
-
-	itemButton:SetAttribute("item", itemString)
-	print("Item after initial full initialisation => " .. (itemButton:GetAttribute("item") or "Nil"))
+	-- Using link, itemName, itemId yield the same result
+	itemButton:SetAttribute("item", link)
 
 	QuestObjectiveItem_UpdateCooldown(itemButton);
 end
@@ -123,14 +116,16 @@ end
 ---@param button Button
 ---@param mouseButton string
 function QuestObjectiveItem_OnClick(button, mouseButton)
+	print("Time UTC => " .. time())
+	print("Button type => "..(button:GetAttribute("type*") or "Nil")
+		.." Button item => " .. (button:GetAttribute("item") or "Nil"))
+
 	if ( IsModifiedClick("CHATLINK") and ChatEdit_GetActiveWindow() ) then
 		local link = GetQuestLogSpecialItemInfo(button:GetID());
 		if ( link ) then
 			ChatEdit_InsertLink(link);
 		end
 	else
-		print("Time UTC => " .. time())
-		print("Click using button => " .. mouseButton);
 		-- UseQuestLogSpecialItem(button:GetID());			-- Protected function
 	end
 end
