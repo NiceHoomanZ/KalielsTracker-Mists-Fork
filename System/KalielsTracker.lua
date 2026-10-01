@@ -827,7 +827,7 @@ local function SetHooks()
 			else
 				KT.Utils.Log(" - CREATE button "..questID)
 				local name = addonName.."Button"..time()..questID
-				button = CreateFrame("Button", name, KTF.Buttons, "SecureActionButtonTemplate")		--"KTQuestObjectiveItemButtonTemplate"
+				button = CreateFrame("Button", name, KTF.Buttons, "SecureActionButtonTemplate")
 				button:SetSize(26, 26)
 
 				button.icon = button:CreateTexture(name.."Icon", "BORDER")
@@ -864,9 +864,8 @@ local function SetHooks()
 				button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
 				button:SetFrameLevel(KTF:GetFrameLevel() + 1)
 				button:Hide()	-- Cooldown init
-
-				--KT:Masque_AddButton(button)
             end
+
             if not isSpell then
 				button:SetScript("OnEvent", QuestObjectiveItem_OnEvent)
 				button:SetScript("OnUpdate", QuestObjectiveItem_OnUpdate)
@@ -883,7 +882,9 @@ local function SetHooks()
 				button:SetScript("OnEnter", ScenarioSpellButton_OnEnter)
 				button:SetScript("OnLeave", GameTooltip_Hide)
 			end
+
 			button:SetScript("OnMouseDown", QuestObjectiveItem_OnClick)
+
             button:SetAttribute("type*", isSpell and "spell" or "item")
 			button:Show()
 			KT.fixedButtons[questID] = button

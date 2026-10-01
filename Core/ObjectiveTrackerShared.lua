@@ -91,16 +91,16 @@ end
 ---@param itemButton Button|unknown
 ---@param questLogIndex number
 function QuestObjectiveItem_Initialize(itemButton, questLogIndex)
-	local link, iconID, charges = GetQuestLogSpecialItemInfo(questLogIndex);
-	itemButton:SetID(questLogIndex);
-	itemButton.link = link;
-	itemButton.charges = charges;
-	itemButton.rangeTimer = -1;
-	SetItemButtonTexture(itemButton, iconID);
-	SetItemButtonCount(itemButton, charges);
+	-- local link, iconID, charges = GetQuestLogSpecialItemInfo(questLogIndex);
+	-- itemButton:SetID(questLogIndex);
+	-- itemButton.link = link;
+	-- itemButton.charges = charges;
+	-- itemButton.rangeTimer = -1;
+	-- SetItemButtonTexture(itemButton, iconID);
+	-- SetItemButtonCount(itemButton, charges);
 
-	-- Using link, itemName, itemId yield the same result
-	itemButton:SetAttribute("item", link)
+	-- -- Using link, itemName, itemId yield the same result
+	-- itemButton:SetAttribute("item", link)
 
 	QuestObjectiveItem_UpdateCooldown(itemButton);
 end
@@ -116,7 +116,7 @@ end
 ---@param button Button
 ---@param mouseButton string
 function QuestObjectiveItem_OnClick(button, mouseButton)
-	print("Time UTC => " .. time())
+	print("-------------------")
 	print("Button type => "..(button:GetAttribute("type*") or "Nil")
 		.." Button item => " .. (button:GetAttribute("item") or "Nil"))
 
@@ -126,6 +126,7 @@ function QuestObjectiveItem_OnClick(button, mouseButton)
 			ChatEdit_InsertLink(link);
 		end
 	else
+		-- print("buttinId => " .. button:GetID())
 		-- UseQuestLogSpecialItem(button:GetID());			-- Protected function
 	end
 end
