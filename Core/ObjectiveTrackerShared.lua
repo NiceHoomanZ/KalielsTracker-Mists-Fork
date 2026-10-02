@@ -1,3 +1,8 @@
+-- *****************************************************************************************************
+-- ***** UTIL FUNCTIONS
+-- *****************************************************************************************************
+-- TODO Keep or remove whole Util section, if keept move it to its own file
+
 local Util = {}
 
 Util.FORMAT_itemid = "item:%d:0:0:0:0:0:0:0"
@@ -91,6 +96,7 @@ end
 ---@param itemButton Button|unknown
 ---@param questLogIndex number
 function QuestObjectiveItem_Initialize(itemButton, questLogIndex)
+	-- TODO Keep or remove
 	-- local link, iconID, charges = GetQuestLogSpecialItemInfo(questLogIndex);
 	-- itemButton:SetID(questLogIndex);
 	-- itemButton.link = link;
@@ -126,6 +132,7 @@ function QuestObjectiveItem_OnClick(button, mouseButton)
 			ChatEdit_InsertLink(link);
 		end
 	else
+		-- TODO Keep or remove
 		-- print("buttinId => " .. button:GetID())
 		-- UseQuestLogSpecialItem(button:GetID());			-- Protected function
 	end
