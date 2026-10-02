@@ -12,7 +12,15 @@
                 "kind": "build",
                 "isDefault": true
             },
-             "args": ["C:/Program Files (x86)/World of Warcraft/_classic_/Interface/AddOns/!KalielsTracker"]
+            "args": ["C:/Program Files (x86)/World of Warcraft/_classic_/Interface/AddOns/!KalielsTracker"],
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
         }
     ]
 }
