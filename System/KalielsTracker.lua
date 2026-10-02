@@ -11,7 +11,12 @@ local KT = LibStub("MSA-AceAddon-3.0"):NewAddon(addon, addonName, "LibSink-2.0",
 KT:SetDefaultModuleState(false)
 
 local LSM = LibStub("LibSharedMedia-3.0")
-local _DBG = function(...) if _DBG then _DBG("KT", ...) end end
+
+-- TODO Add documentation for it (which addon and version are use for debug)
+-- TODO Clean up stupid logs
+-- TODO Make the declation at one place and use by all script ?
+-- TODO Add categories based on file name
+local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 -- Lua API
 local abs = math.abs

@@ -12,7 +12,7 @@ local M = KT:NewModule("AddonPetTracker")
 KT.AddonPetTracker = M
 
 local LSM = LibStub("LibSharedMedia-3.0")
-local _DBG = function(...) if _DBG then _DBG("KT", ...) end end
+local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 local db, dbChar
 local OTF = KT_ObjectiveTrackerFrame

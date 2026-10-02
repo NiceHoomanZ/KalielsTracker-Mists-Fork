@@ -12,7 +12,7 @@ local M = KT:NewModule("Help")
 KT.Help = M
 
 local T = LibStub("MSA-Tutorials-1.0")
-local _DBG = function(...) if _DBG then _DBG("KT", ...) end end
+local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 local HELP_PATH = KT.MEDIA_PATH.."Help\\"
 local ICON_URL = HELP_PATH.."help_icon-url"

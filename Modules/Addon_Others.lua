@@ -11,7 +11,7 @@ local addonName, KT = ...
 local M = KT:NewModule("AddonOthers")
 KT.AddonOthers = M
 
-local _DBG = function(...) if _DBG then _DBG("KT", ...) end end
+local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 -- WoW API
 local _G = _G

@@ -15,7 +15,7 @@ local ACD = LibStub("MSA-AceConfigDialog-3.0")
 local ACR = LibStub("AceConfigRegistry-3.0")
 local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetLists = AceGUIWidgetLSMlists
-local _DBG = function(...) if _DBG then _DBG("KT", ...) end end
+local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 -- Lua API
 local floor = math.floor

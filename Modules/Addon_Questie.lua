@@ -11,7 +11,7 @@ local _, KT = ...
 local M = KT:NewModule("AddonQuestie")
 KT.AddonQuestie = M
 
-local _DBG = function(...) if _DBG then _DBG("KT", ...) end end
+local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 -- Lua API
 local ipairs = ipairs

@@ -11,7 +11,7 @@ local addonName, KT = ...
 local M = KT:NewModule("Filters")
 KT.Filters = M
 
-local _DBG = function(...) if _DBG then _DBG("KT", ...) end end
+local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 -- Lua API
 local ipairs = ipairs
