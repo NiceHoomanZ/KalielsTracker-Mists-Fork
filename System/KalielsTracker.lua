@@ -17,11 +17,8 @@ local LSM = LibStub("LibSharedMedia-3.0")
 -- Lua API
 local abs = math.abs
 local floor = math.floor
-local fmod = math.fmod
 local format = string.format
-local gsub = string.gsub
 local ipairs = ipairs
-local max = math.max
 local pairs = pairs
 local strfind = string.find
 local tonumber = tonumber
@@ -34,9 +31,7 @@ local round = function(n) return floor(n + 0.5) end
 local _G = _G
 local CreateFrame = CreateFrame
 local GameTooltip = GameTooltip
-local HaveQuestData = HaveQuestData
 local InCombatLockdown = InCombatLockdown
-local FormatLargeNumber = FormatLargeNumber
 local UIParent = UIParent
 
 local trackerWidth = 280
