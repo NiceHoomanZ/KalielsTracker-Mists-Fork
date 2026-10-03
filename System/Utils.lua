@@ -4,8 +4,9 @@
 ---
 --- This file is part of addon Kaliel's Tracker.
 
----@type KT
-local _, KT = ...
+local addonName, addon = ...
+---@class KT
+local KT = addon
 
 -- Lua API
 local floor = math.floor
@@ -18,6 +19,30 @@ local strfind = string.find
 local strlen = string.len
 local strsub = string.sub
 local tonumber = tonumber
+
+---@class Utils
+local Utils = {}
+KT.Utils = Utils
+
+-- TODO Add documentation for it (which addon and version are use for debug)
+-- TODO Test the category thing
+local function DebugLog(...)
+    if DLAPI == nil then return end
+
+    DLAPI.DebugLog("KT", ...)
+end
+
+function Utils.Log(...)
+    DebugLog("OK~" .. ...)
+end
+
+function Utils.LogWarning(...)
+    DebugLog("WARN~" .. ...)
+end
+
+function Utils.LogError(...)
+    DebugLog("ERROR~" .. ...)
+end
 
 -- Version
 function KT.IsHigherVersion(newVersion, oldVersion)

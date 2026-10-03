@@ -4,15 +4,15 @@
 ---
 --- This file is part of addon Kaliel's Tracker.
 
----@type KT
-local _, KT = ...
+local addonName, addon = ...
+---@class KT
+local KT = addon
 
 ---@class Help
 local M = KT:NewModule("Help")
 KT.Help = M
 
 local T = LibStub("MSA-Tutorials-1.0")
-local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 local HELP_PATH = KT.MEDIA_PATH.."Help\\"
 local ICON_URL = HELP_PATH.."help_icon-url"
@@ -438,14 +438,15 @@ end
 --------------
 
 function M:OnInitialize()
-	_DBG("|cffffff00Init|r - "..self:GetName(), true)
+	KT.Utils.Log("|cffffff00Init|r - "..self:GetName())
 	db = KT.db.profile
 	dbChar = KT.db.char
     self.isAvailable = true
 end
 
 function M:OnEnable()
-	_DBG("|cff00ff00Enable|r - "..self:GetName(), true)
+	KT.Utils.Log("|cff00ff00Enable|r - "..self:GetName())
+
 	SetupTutorials()
 	local last = false
 	if KT.VERSION ~= KT.db.global.version then

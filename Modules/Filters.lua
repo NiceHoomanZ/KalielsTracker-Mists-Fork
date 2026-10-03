@@ -4,14 +4,13 @@
 ---
 --- This file is part of addon Kaliel's Tracker.
 
----@type KT
-local addonName, KT = ...
+local addonName, addon = ...
+---@class KT
+local KT = addon
 
 ---@class Filters
 local M = KT:NewModule("Filters")
 KT.Filters = M
-
-local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 -- Lua API
 local ipairs = ipairs
@@ -162,7 +161,7 @@ local function IsInstanceQuest(questID)
 	if difficultyTags then
 		local tagID, tagName = GetQuestTagInfo(questID)
 		for _, tag in ipairs(difficultyTags) do
-			_DBG(difficulty.." ... "..tag, true)
+			KT.Utils.Log(difficulty.." ... "..tag, true)
 			if tag == tagID then
 				return true
 			end
@@ -344,7 +343,7 @@ local function Filter_Achievements(spec)
 		local zoneName = zoneSlug[mapID] or KT.GetMapNameByID(mapID)
         local categoryName = GetCategoryByZone()
 		local instance = KT.inInstance and 168 or nil
-		_DBG(continentName.." / "..zoneName.." ... "..mapID.." ... "..categoryName, true)
+		KT.Utils.Log(continentName.." / "..zoneName.." ... "..mapID.." ... "..categoryName, true)
 
 		-- Dungeons & Raids
 		local instanceDifficulty, instanceSize
@@ -357,7 +356,7 @@ local function Filter_Achievements(spec)
 				instanceDifficulty = diff or "Normal"
 				instanceSize = strlower(size or difficultyName)
 			end
-			_DBG(type.." ... "..difficulty.." ... "..difficultyName, true)
+			KT.Utils.Log(type.." ... "..difficulty.." ... "..difficultyName, true)
 		end
 
 		-- World Events
@@ -388,7 +387,6 @@ local function Filter_Achievements(spec)
 						local track = false
 						local aId, aName, _, aCompleted, _, _, _, aDescription = GetAchievementInfo(category, j)
 						if aId and not aCompleted then
-							--_DBG(aId.." ... "..aName, true)
 							local aText = aName.." - "..aDescription
 							local cNumItems = GetAchievementNumCriteria(aId)
 							local cType = -1
@@ -446,9 +444,6 @@ local function Filter_Achievements(spec)
 			if GetNumTrackedAchievements() == MAX_TRACKED_ACHIEVEMENTS then
 				break
 			end
-			if parentID == -1 then
-				--_DBG(category.." ... "..name, true)
-			end
 		end
 	elseif spec == "wevent" then
 		local events = GetActiveWorldEvents()
@@ -473,9 +468,6 @@ local function Filter_Achievements(spec)
 			end
 			if GetNumTrackedAchievements() == MAX_TRACKED_ACHIEVEMENTS then
 				break
-			end
-			if parentID == -1 then
-				--_DBG(category.." ... "..name, true)
 			end
 		end
 
@@ -886,7 +878,7 @@ local function SetFrames()
 	if not eventFrame then
 		eventFrame = CreateFrame("Frame")
 		eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
-			_DBG("Event - "..event, true)
+			KT.Utils.Log("Event - "..event, true)
 			if event == "ADDON_LOADED" and arg1 == "Blizzard_AchievementUI" then
 				SetHooks_AchievementUI()
 				self:UnregisterEvent(event)
@@ -975,7 +967,7 @@ end
 --------------
 
 function M:OnInitialize()
-	_DBG("|cffffff00Init|r - "..self:GetName(), true)
+	KT.Utils.Log("|cffffff00Init|r - "..self:GetName())
 	db = KT.db.profile
 	dbChar = KT.db.char
     self.isAvailable = true
@@ -1014,7 +1006,7 @@ function M:OnInitialize()
 end
 
 function M:OnEnable()
-	_DBG("|cff00ff00Enable|r - "..self:GetName(), true)
+	KT.Utils.Log("|cff00ff00Enable|r - "..self:GetName())
 	SetHooks()
 	SetFrames()
 end

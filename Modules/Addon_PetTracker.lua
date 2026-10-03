@@ -4,15 +4,15 @@
 ---
 --- This file is part of addon Kaliel's Tracker.
 
----@type KT
-local _, KT = ...
+local addonName, addon = ...
+---@class KT
+local KT = addon
 
 ---@class AddonPetTracker
 local M = KT:NewModule("AddonPetTracker")
 KT.AddonPetTracker = M
 
 local LSM = LibStub("LibSharedMedia-3.0")
-local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 local db, dbChar
 local OTF = KT_ObjectiveTrackerFrame
@@ -269,7 +269,7 @@ function M:Update(forced)
 end
 
 function M:OnInitialize()
-    _DBG("|cffffff00Init|r - "..self:GetName(), true)
+    KT.Utils.Log("|cffffff00Init|r - "..self:GetName())
     db = KT.db.profile
     dbChar = KT.db.char
     self.isAvailable = (KT:CheckAddOn("PetTracker", "11.2.7") and db.addonPetTracker)
@@ -286,7 +286,7 @@ function M:OnInitialize()
 end
 
 function M:OnEnable()
-    _DBG("|cff00ff00Enable|r - "..self:GetName(), true)
+    KT.Utils.Log("|cff00ff00Enable|r - "..self:GetName())
     SetFrames()
     SetHooks()
 

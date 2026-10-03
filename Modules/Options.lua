@@ -4,8 +4,9 @@
 ---
 --- This file is part of addon Kaliel's Tracker.
 
----@type KT
-local addonName, KT = ...
+local addonName, addon = ...
+---@class KT
+local KT = addon
 
 ---@class Options
 local M = KT:NewModule("Options")
@@ -15,7 +16,6 @@ local ACD = LibStub("MSA-AceConfigDialog-3.0")
 local ACR = LibStub("AceConfigRegistry-3.0")
 local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetLists = AceGUIWidgetLSMlists
-local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 -- Lua API
 local floor = math.floor
@@ -1538,13 +1538,13 @@ local function SetupModules()
 end
 
 function M:OnInitialize()
-	_DBG("|cffffff00Init|r - "..self:GetName(), true)
+	KT.Utils.Log("|cffffff00Init|r - "..self:GetName())
 	Init()
     self.isAvailable = true
 end
 
 function M:OnEnable()
-	_DBG("|cff00ff00Enable|r - "..self:GetName(), true)
+	KT.Utils.Log("|cff00ff00Enable|r - "..self:GetName())
 	Setup()
 
 	KT:RegEvent("PLAYER_ENTERING_WORLD", function(eventID)

@@ -4,14 +4,14 @@
 ---
 --- This file is part of addon Kaliel's Tracker.
 
----@type KT
-local addonName, KT = ...
+local addonName, addon = ...
+---@class KT
+local KT = addon
 
 ---@class AddonOthers
 local M = KT:NewModule("AddonOthers")
 KT.AddonOthers = M
 
-local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 -- WoW API
 local _G = _G
@@ -156,13 +156,13 @@ end
 --------------
 
 function M:OnInitialize()
-    _DBG("|cffffff00Init|r - "..self:GetName(), true)
+    KT.Utils.Log("|cffffff00Init|r - "..self:GetName())
     db = KT.db.profile
     self.isAvailable = true
 end
 
 function M:OnEnable()
-    _DBG("|cff00ff00Enable|r - "..self:GetName(), true)
+    KT.Utils.Log("|cff00ff00Enable|r - "..self:GetName())
     ElvUI_SetSupport()
     Tukui_SetSupport()
     QuestGuru_ClassicQuestLog_SetSupport()

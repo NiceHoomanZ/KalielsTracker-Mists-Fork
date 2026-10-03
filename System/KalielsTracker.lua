@@ -5,18 +5,14 @@
 --- This file is part of addon Kaliel's Tracker.
 
 local addonName, addon = ...
+---@class KT
+local KT = addon
 
 ---@class KT
 local KT = LibStub("MSA-AceAddon-3.0"):NewAddon(addon, addonName, "LibSink-2.0", "MSA-Event-1.0", "MSA-ProtRouter-1.0")
 KT:SetDefaultModuleState(false)
 
 local LSM = LibStub("LibSharedMedia-3.0")
-
--- TODO Add documentation for it (which addon and version are use for debug)
--- TODO Clean up stupid logs
--- TODO Make the declation at one place and use by all script ?
--- TODO Add categories based on file name
-local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 -- Lua API
 local abs = math.abs
@@ -237,7 +233,7 @@ local function SetFrames()
 	KTF:SetFrameLevel(KTF:GetFrameLevel() + 25)
 
 	KTF:SetScript("OnEvent", function(_, event, ...)
-		_DBG("Event - "..event)
+		KT.Utils.Log("Event - "..event)
 		if event == "PLAYER_ENTERING_WORLD" and not KT.stopUpdate then
 			KT.inWorld = true
 			KT.inInstance = IsInInstance()
@@ -377,7 +373,7 @@ local function SetFrames()
 			if self.value > 0 and self.value < OTF.height-db.maxHeight then
 				MSA_CloseDropDownMenus()
 			end
-			_DBG("SCROLL ... "..self.value.." ... "..OTF.height.." - "..db.maxHeight)
+			KT.Utils.Log("SCROLL ... "..self.value.." ... "..OTF.height.." - "..db.maxHeight)
 		end
 	end)
 	KTF.Scroll = Scroll
@@ -458,7 +454,7 @@ local function SetHooks()
 				local idx = 0
 				local contentsHeight = 0
 				-- Quest items
-				_DBG(" - REANCHOR buttons - Q", true)
+				KT.Utils.Log(" - REANCHOR buttons - Q", true)
 				for i = 1, GetNumQuestWatches() do
 					local questLogIndex = GetQuestIndexForWatch(i)
 					local questID = GetQuestIDFromLogIndex(questLogIndex)
@@ -497,7 +493,7 @@ local function SetHooks()
 			else
 				dbgReason = reason and format("%x", reason) or ""
 			end
-			_DBG("|cffffff00Update ... "..dbgReason, true)
+			KT.Utils.Log("|cffffff00Update ... "..dbgReason, true)
 		end
 		bck_ObjectiveTracker_Update(reason, id)
 		KT:ToggleEmptyTracker(id)
@@ -818,18 +814,18 @@ local function SetHooks()
 		local button = KT:GetFixedButton(questID)
 		if not button then
 			if InCombatLockdown() then
-				_DBG(" - STOP Create button")
+				KT.Utils.Log(" - STOP Create button")
 				combatLockdown = true
 				return nil
 			end
 
 			local numFreeButtons = #freeButtons
 			if numFreeButtons > 0 then
-				_DBG(" - USE button "..questID)
+				KT.Utils.Log(" - USE button "..questID)
 				button = freeButtons[numFreeButtons]
 				tremove(freeButtons, numFreeButtons)
 			else
-				_DBG(" - CREATE button "..questID)
+				KT.Utils.Log(" - CREATE button "..questID)
 				local name = addonName.."Button"..time()..questID
 				button = CreateFrame("Button", name, KTF.Buttons, "SecureActionButtonTemplate")		--"KTQuestObjectiveItemButtonTemplate"
 				button:SetSize(26, 26)
@@ -1064,8 +1060,8 @@ local function SetHooks()
 	end
 
 	function ObjectiveTracker_Collapse()  -- R
-		_DBG("--------------------------------")
-		_DBG("COLLAPSE")
+		KT.Utils.Log("--------------------------------")
+		KT.Utils.Log("COLLAPSE")
 		OTF.collapsed = true
 		dbChar.collapsed = OTF.collapsed
 		OTF.BlocksFrame:Hide()
@@ -1075,8 +1071,8 @@ local function SetHooks()
 	end
 
 	function ObjectiveTracker_Expand()  -- R
-		_DBG("--------------------------------")
-		_DBG("EXPAND")
+		KT.Utils.Log("--------------------------------")
+		KT.Utils.Log("EXPAND")
 		OTF.collapsed = nil
 		dbChar.collapsed = OTF.collapsed
 		OTF.BlocksFrame:Show()
@@ -1371,18 +1367,15 @@ function KT:SetSize()
 		return
 	end
 
-	_DBG(" - height = "..OTF.BlocksFrame.contentsHeight)
 	if not dbChar.collapsed and not self:IsTrackerEmpty() then
 		-- width
 		KTF:SetWidth(trackerWidth)
 
 		-- height
 		height = OTF.BlocksFrame.contentsHeight + mod + 10 + paddingBottom
-		_DBG(" - "..OTF.BlocksFrame.contentsHeight.." + "..mod.." + 10 + "..paddingBottom.." = "..height, true)
 		OTF.height = height
 
 		if height > db.maxHeight then
-			_DBG("MOVE ... "..KTF.Scroll.value.." > "..OTF.height.." - "..db.maxHeight)
 			if KTF.Scroll.value > OTF.height-db.maxHeight then
 				KTF.Scroll.value = OTF.height - db.maxHeight
 			end
@@ -1706,10 +1699,10 @@ function KT:RemoveFixedButton(block)
 		if button then
 			button:SetAlpha(0)
 			if InCombatLockdown() then
-				_DBG(" - STOP Remove button")
+				KT.Utils.Log(" - STOP Remove button")
 				combatLockdown = true
 			else
-				_DBG(" - REMOVE button "..questID)
+				KT.Utils.Log(" - REMOVE button "..questID)
 				tinsert(freeButtons, button)
 				self.fixedButtons[questID] = nil
 				button:Hide()
@@ -1718,7 +1711,7 @@ function KT:RemoveFixedButton(block)
 		end
 	else
 		for questID, button in pairs(self.fixedButtons) do
-			_DBG(" - REMOVE button "..questID)
+			KT.Utils.Log(" - REMOVE button "..questID)
 			tinsert(freeButtons, button)
 			self.fixedButtons[questID] = nil
 			button:Hide()
@@ -1852,7 +1845,7 @@ end
 -- Load ----------------------------------------------------------------------------------------------------------------
 
 function KT:OnInitialize()
-	_DBG("|cffffff00Init|r - "..self:GetName(), true)
+	KT.Utils.Log("|cffffff00Init|r - "..self:GetName())
 
 	SLASH_KALIELSTRACKER1, SLASH_KALIELSTRACKER2 = "/kt", "/kalielstracker"
 	SlashCmdList["KALIELSTRACKER"] = SlashHandler
@@ -1907,7 +1900,7 @@ function KT:OnInitialize()
 end
 
 function KT:OnEnable()
-	_DBG("|cff00ff00Enable|r - "..self:GetName(), true)
+	KT.Utils.Log("|cff00ff00Enable|r - "..self:GetName())
 	db = self.db.profile
 	dbChar = self.db.char
 

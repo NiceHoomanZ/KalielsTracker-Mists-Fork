@@ -4,14 +4,13 @@
 ---
 --- This file is part of addon Kaliel's Tracker.
 
----@type KT
-local _, KT = ...
+local addonName, addon = ...
+---@class KT
+local KT = addon
 
 ---@class QuestLog
 local M = KT:NewModule("QuestLog")
 KT.QuestLog = M
-
-local _DBG = function(...) if DLAPI then DLAPI.DebugLog("KT", ...) end end
 
 local db
 
@@ -96,7 +95,7 @@ end
 --------------
 
 function M:OnInitialize()
-	_DBG("|cffffff00Init|r - "..self:GetName(), true)
+	KT.Utils.Log("|cffffff00Init|r - "..self:GetName())
 	db = KT.db.profile
 	self.isAvailable = true
 
