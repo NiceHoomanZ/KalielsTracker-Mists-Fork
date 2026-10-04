@@ -24,7 +24,6 @@ local tonumber = tonumber
 local Utils = {}
 KT.Utils = Utils
 
--- TODO Test the category thing
 local function DebugLog(...)
     if DLAPI == nil then return end
 
@@ -41,6 +40,12 @@ end
 
 function Utils.LogError(...)
     DebugLog("ERROR~" .. ...)
+end
+
+---Append category to a log message
+---@param category string
+function Utils.AppendCategory(category, ...)
+    return category .. "~" .. ...
 end
 
 -- Version

@@ -164,6 +164,7 @@
         "HONOR",
         "BONUS_OBJECTIVE_REWARD_WITH_COUNT_FORMAT",
         "BONUS_OBJECTIVE_REWARD_FORMAT",
+        "DLAPI"
     ],
     "Lua.type.weakUnionCheck": true
 }
