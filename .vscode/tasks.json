@@ -14,7 +14,7 @@
             },
             "args": ["C:/Program Files (x86)/World of Warcraft/_classic_/Interface/AddOns/!KalielsTracker"],
             "presentation": {
-                "echo": true,
+                "echo": false,
                 "reveal": "silent",
                 "focus": false,
                 "panel": "shared",
