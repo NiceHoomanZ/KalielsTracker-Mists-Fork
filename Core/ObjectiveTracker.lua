@@ -1,3 +1,7 @@
+local addonName, addon = ...
+---@class KT
+local KT = addon
+
 -- Who objects to the ObjectiveTracker...?
 
 OBJECTIVE_TRACKER_ITEM_WIDTH = 33;
@@ -20,15 +24,15 @@ OBJECTIVE_TRACKER_COLOR = {
 	["TimeLeft"] = { r = DIM_RED_FONT_COLOR.r, g = DIM_RED_FONT_COLOR.g, b = DIM_RED_FONT_COLOR.b },
 	["TimeLeftHighlight"] = { r = RED_FONT_COLOR.r, g = RED_FONT_COLOR.g, b = RED_FONT_COLOR.b },
 };
-	OBJECTIVE_TRACKER_COLOR["Normal"].reverse = OBJECTIVE_TRACKER_COLOR["NormalHighlight"];
-	OBJECTIVE_TRACKER_COLOR["NormalHighlight"].reverse = OBJECTIVE_TRACKER_COLOR["Normal"];
-	OBJECTIVE_TRACKER_COLOR["Failed"].reverse = OBJECTIVE_TRACKER_COLOR["FailedHighlight"];
-	OBJECTIVE_TRACKER_COLOR["FailedHighlight"].reverse = OBJECTIVE_TRACKER_COLOR["Failed"];
-	OBJECTIVE_TRACKER_COLOR["Header"].reverse = OBJECTIVE_TRACKER_COLOR["HeaderHighlight"];
-	OBJECTIVE_TRACKER_COLOR["HeaderHighlight"].reverse = OBJECTIVE_TRACKER_COLOR["Header"];
-	OBJECTIVE_TRACKER_COLOR["TimeLeft"].reverse = OBJECTIVE_TRACKER_COLOR["TimeLeftHighlight"];
-	OBJECTIVE_TRACKER_COLOR["TimeLeftHighlight"].reverse = OBJECTIVE_TRACKER_COLOR["TimeLeft"];
 
+OBJECTIVE_TRACKER_COLOR["Normal"].reverse = OBJECTIVE_TRACKER_COLOR["NormalHighlight"];
+OBJECTIVE_TRACKER_COLOR["NormalHighlight"].reverse = OBJECTIVE_TRACKER_COLOR["Normal"];
+OBJECTIVE_TRACKER_COLOR["Failed"].reverse = OBJECTIVE_TRACKER_COLOR["FailedHighlight"];
+OBJECTIVE_TRACKER_COLOR["FailedHighlight"].reverse = OBJECTIVE_TRACKER_COLOR["Failed"];
+OBJECTIVE_TRACKER_COLOR["Header"].reverse = OBJECTIVE_TRACKER_COLOR["HeaderHighlight"];
+OBJECTIVE_TRACKER_COLOR["HeaderHighlight"].reverse = OBJECTIVE_TRACKER_COLOR["Header"];
+OBJECTIVE_TRACKER_COLOR["TimeLeft"].reverse = OBJECTIVE_TRACKER_COLOR["TimeLeftHighlight"];
+OBJECTIVE_TRACKER_COLOR["TimeLeftHighlight"].reverse = OBJECTIVE_TRACKER_COLOR["TimeLeft"];
 
 -- these are generally from events
 OBJECTIVE_TRACKER_UPDATE_QUEST						= 0x00001;
@@ -41,6 +45,7 @@ OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT				= 0x00040;
 OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT_ADDED			= 0x00080;
 OBJECTIVE_TRACKER_UPDATE_SCENARIO_BONUS_DELAYED		= 0x00100;
 OBJECTIVE_TRACKER_UPDATE_SUPER_TRACK_CHANGED		= 0x00200;
+
 -- these are for the specific module ONLY!
 OBJECTIVE_TRACKER_UPDATE_MODULE_QUEST				= 0x00400;
 OBJECTIVE_TRACKER_UPDATE_MODULE_AUTO_QUEST_POPUP	= 0x00800;
@@ -50,12 +55,66 @@ OBJECTIVE_TRACKER_UPDATE_MODULE_SCENARIO			= 0x04000;
 OBJECTIVE_TRACKER_UPDATE_MODULE_ACHIEVEMENT			= 0x08000;
 OBJECTIVE_TRACKER_UPDATE_SCENARIO_SPELLS			= 0x10000;
 OBJECTIVE_TRACKER_UPDATE_MODULE_UI_WIDGETS			= 0x20000;
+
 -- special updates
 OBJECTIVE_TRACKER_UPDATE_STATIC						= 0x0000;
 OBJECTIVE_TRACKER_UPDATE_ALL						= 0xFFFFFFFF;
 
 OBJECTIVE_TRACKER_UPDATE_REASON = OBJECTIVE_TRACKER_UPDATE_ALL;		-- default
 OBJECTIVE_TRACKER_UPDATE_ID = 0;
+
+DEBUG_UPDATE_REASONS = {
+	-- Events
+	PET_BATTLE_CLOSE			= -101;
+	COMBAT_STOP					= -102;
+	PLAYER_ENTERING_WORLD		= -103;
+	VARIABLES_LOADED			= -104;
+	WAYPOINT_UPDATE				= -105;
+	-- Specials
+	FORCED						= -500;
+	TRACKER_INITIALIZE			= -501;
+	TRACKER_TOGGLE				= -502;
+	TRACKER_SIZE_CHANGED		= -503;
+	TRACKER_IS_DIRTY			= -504;
+	FILTER_CHANGED				= -505;
+	SETTINGS_CHANGED			= -506;
+}
+
+DEBUG_UPDATE_DESCS = {
+	[OBJECTIVE_TRACKER_UPDATE_QUEST] = "Quest updated",
+	[OBJECTIVE_TRACKER_UPDATE_QUEST_ADDED] = "Quest added",
+	[OBJECTIVE_TRACKER_UPDATE_TASK_ADDED] = "Task added",
+	[OBJECTIVE_TRACKER_UPDATE_WORLD_QUEST_ADDED] = "World quest added",
+	[OBJECTIVE_TRACKER_UPDATE_SCENARIO] = "Scenario updated",
+	[OBJECTIVE_TRACKER_UPDATE_SCENARIO_NEW_STAGE] = "New scenario stage",
+	[OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT] = "Achievement updated",
+	[OBJECTIVE_TRACKER_UPDATE_ACHIEVEMENT_ADDED] = "Achievement added",
+	[OBJECTIVE_TRACKER_UPDATE_SCENARIO_BONUS_DELAYED] = "Delayed scenario bonus",
+	[OBJECTIVE_TRACKER_UPDATE_SUPER_TRACK_CHANGED] = "Super track changed",
+	[OBJECTIVE_TRACKER_UPDATE_MODULE_QUEST] = "Module: Quest updated",
+	[OBJECTIVE_TRACKER_UPDATE_MODULE_AUTO_QUEST_POPUP] = "Module: Auto quest popup",
+	[OBJECTIVE_TRACKER_UPDATE_MODULE_BONUS_OBJECTIVE] = "Module: Bonus objective",
+	[OBJECTIVE_TRACKER_UPDATE_MODULE_WORLD_QUEST] = "Module: World quest",
+	[OBJECTIVE_TRACKER_UPDATE_MODULE_SCENARIO] = "Module: Scenario",
+	[OBJECTIVE_TRACKER_UPDATE_MODULE_ACHIEVEMENT] = "Module: Achievement",
+	[OBJECTIVE_TRACKER_UPDATE_SCENARIO_SPELLS] = "Scenario spells",
+	[OBJECTIVE_TRACKER_UPDATE_MODULE_UI_WIDGETS] = "Module: UI widgets",
+	[OBJECTIVE_TRACKER_UPDATE_STATIC] = "Update static",
+	[OBJECTIVE_TRACKER_UPDATE_ALL] = "Update all",
+
+	[DEBUG_UPDATE_REASONS.PET_BATTLE_CLOSE] = "Pet battle closed",
+	[DEBUG_UPDATE_REASONS.COMBAT_STOP] = "Combat stopped",
+	[DEBUG_UPDATE_REASONS.PLAYER_ENTERING_WORLD] = "Player entering world",
+	[DEBUG_UPDATE_REASONS.VARIABLES_LOADED] = "Variables loaded",
+	[DEBUG_UPDATE_REASONS.WAYPOINT_UPDATE] = "Waypoint updated",
+	[DEBUG_UPDATE_REASONS.FORCED] = "Forced update",
+	[DEBUG_UPDATE_REASONS.TRACKER_INITIALIZE] = "Tracker initialize",
+	[DEBUG_UPDATE_REASONS.TRACKER_TOGGLE] = "Tracker toggle",
+	[DEBUG_UPDATE_REASONS.TRACKER_SIZE_CHANGED] = "Tracker size changed",
+	[DEBUG_UPDATE_REASONS.TRACKER_IS_DIRTY] = "Tracker is dirty",
+	[DEBUG_UPDATE_REASONS.FILTER_CHANGED] = "Filter changed",
+	[DEBUG_UPDATE_REASONS.SETTINGS_CHANGED] = "Settings changed",
+}
 
 -- speed optimizations
 local floor = math.floor;
@@ -566,6 +625,7 @@ function ObjectiveTrackerTimerBar_OnUpdate(self, elapsed)
 		if ( timeRemaining > -1 ) then
 			timeRemaining = 0;
 		else
+			KT.Utils.LogError("Update for module reason "..KT.Utils.OrNil(self.block.module.updateReasonModule))
 			ObjectiveTracker_Update(self.block.module.updateReasonModule);
 			return;
 		end
@@ -730,9 +790,7 @@ function ObjectiveTracker_OnEvent(self, event, ...)
 	elseif ( event == "QUEST_WATCH_LIST_CHANGED" ) then
 		local questID, added = ...;
 		if ( added ) then
-			--if ( IsQuestComplete(questID) ) then  -- MSA
-				ObjectiveTracker_Update(OBJECTIVE_TRACKER_UPDATE_QUEST_ADDED, questID);
-			--end
+			ObjectiveTracker_Update(OBJECTIVE_TRACKER_UPDATE_QUEST_ADDED, questID);
 		else
 			ObjectiveTracker_Update(OBJECTIVE_TRACKER_UPDATE_QUEST);
 		end
@@ -766,13 +824,10 @@ function ObjectiveTracker_OnEvent(self, event, ...)
 	elseif ( event == "QUEST_TURNED_IN" ) then
 		local questID, xp, money = ...;
 	elseif ( event == "PLAYER_MONEY" and self.watchMoneyReasons > 0 ) then
+		KT.Utils.LogError("Update for money reason "..KT.Utils.OrNil(self.watchMoneyReasons))
 		ObjectiveTracker_Update(self.watchMoneyReasons);
 	elseif ( event == "PLAYER_ENTERING_WORLD" ) then
-		-- MSA
-		--[[if ( not self.initialized ) then
-			ObjectiveTracker_Initialize(self);
-		end]]
-		ObjectiveTracker_Update();
+		ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.PLAYER_ENTERING_WORLD);
 		self.lastMapID = C_Map.GetBestMapForUnit("player");
 	elseif ( event == "CVAR_UPDATE" ) then
 		local arg1 =...;
@@ -780,19 +835,19 @@ function ObjectiveTracker_OnEvent(self, event, ...)
 			ObjectiveTracker_Update(OBJECTIVE_TRACKER_UPDATE_MODULE_QUEST);
 		end
 	elseif ( event == "VARIABLES_LOADED" ) then
-		ObjectiveTracker_Update();
+		ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.VARIABLES_LOADED);
 	elseif ( event == "WAYPOINT_UPDATE" ) then
-		ObjectiveTracker_Update();
+		ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.WAYPOINT_UPDATED);
 	end
 end
 
 function ObjectiveTracker_OnSizeChanged(self)
-	ObjectiveTracker_Update();
+	ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.TRACKER_SIZE_CHANGED);
 end
 
 function ObjectiveTracker_OnUpdate(self)
 	if self.isUpdateDirty then
-		ObjectiveTracker_Update();
+		ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.TRACKER_IS_DIRTY);
 	end
 end
 
@@ -812,7 +867,7 @@ function ObjectiveTracker_MinimizeButton_OnClick(self)
 	else
 		ObjectiveTracker_Collapse();
 	end
-	ObjectiveTracker_Update();
+	ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.TRACKER_TOGGLE);
 end
 
 function ObjectiveTracker_Collapse()
@@ -1052,6 +1107,8 @@ function DEFAULT_OBJECTIVE_TRACKER_MODULE:StaticReanchor()
 	self:EndLayout(true);
 end
 
+---@param reason number
+---@param id number
 function ObjectiveTracker_Update(reason, id)
 	local tracker = KT_ObjectiveTrackerFrame;
 	if tracker.isUpdating then

@@ -376,7 +376,7 @@ local function SetupTutorials()
 						self[i].shine = block
 					end
 					KTF.Scroll.value = 0
-					ObjectiveTracker_Update()
+					ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.FORCED)
 				end
 			elseif i == 5 then
 				self[i].shine = KTF.Buttons

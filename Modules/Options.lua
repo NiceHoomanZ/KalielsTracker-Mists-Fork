@@ -559,7 +559,7 @@ local options = {
 							type = "toggle",
 							set = function()
 								db.colorDifficulty = not db.colorDifficulty
-								ObjectiveTracker_Update()
+								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 3.5,
 						},
@@ -748,7 +748,7 @@ local options = {
 							end,
 							set = function()
 								db.headerCollapsedTxt = 1
-								ObjectiveTracker_Update()
+								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 4.41,
 						},
@@ -761,7 +761,7 @@ local options = {
 							end,
 							set = function()
 								db.headerCollapsedTxt = 2
-								ObjectiveTracker_Update()
+								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 4.42,
 						},
@@ -773,7 +773,7 @@ local options = {
 							end,
 							set = function()
 								db.headerCollapsedTxt = 3
-								ObjectiveTracker_Update()
+								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 4.43,
 						},
@@ -785,7 +785,7 @@ local options = {
 								db.headerOtherButtons = not db.headerOtherButtons
 								KT:ToggleOtherButtons()
 								KT:SetBackground()
-								ObjectiveTracker_Update()
+								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 4.5,
 						},
@@ -1026,7 +1026,7 @@ local options = {
 							type = "toggle",
 							set = function()
 								db.questsShowLevels = not db.questsShowLevels
-								ObjectiveTracker_Update()
+								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 1.3,
 						},
@@ -1036,7 +1036,7 @@ local options = {
 							type = "toggle",
 							set = function()
 								db.questsShowTags = not db.questsShowTags
-								ObjectiveTracker_Update()
+								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 1.4,
 						},
@@ -1046,7 +1046,7 @@ local options = {
 							type = "toggle",
 							set = function()
 								db.questsShowZones = not db.questsShowZones
-								ObjectiveTracker_Update()
+								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 1.5,
 						},
@@ -1060,7 +1060,7 @@ local options = {
 							width = "full",
 							set = function()
 								db.questsObjectiveNumSwitch = not db.questsObjectiveNumSwitch
-								ObjectiveTracker_Update()
+								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 1.6,
 						},
@@ -1408,7 +1408,7 @@ function MoveModule(idx, direction)
 
 	module = tremove(OTF.MODULES_UI_ORDER, idx)
 	tinsert(OTF.MODULES_UI_ORDER, tmpIdx, module)
-	ObjectiveTracker_Update()
+	ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 end
 
 function SetSharedColor(color)
@@ -1488,7 +1488,7 @@ local function Setup()
 				KT:SetBackground()
 				KT.QuestsCache_Rebuild(true, true)
 				KT.stopUpdate = false
-				ObjectiveTracker_Update()
+				ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 			end,
 			order = 0.2,
 		},

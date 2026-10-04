@@ -86,7 +86,7 @@ local function ObjectiveTracker_Toggle()
 	else
 		ObjectiveTracker_Collapse()
 	end
-	ObjectiveTracker_Update()
+	ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.TRACKER_TOGGLE)
 end
 
 local function SetHeaders(type)
@@ -206,7 +206,7 @@ local function Init()
 		if dbChar.collapsed then
 			ObjectiveTracker_Toggle()
 		else
-			ObjectiveTracker_Update()
+			ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.TRACKER_INITIALIZE)
 		end
 
 		KT:SetQuestsHeaderText()
@@ -250,7 +250,7 @@ local function SetFrames()
 				for i = 1, numSpells do
 					KT:RemoveFixedButton(ScenarioObjectiveBlock.spells[i])
 				end
-				ObjectiveTracker_Update()
+				ObjectiveTracker_Update(OBJECTIVE_TRACKER_UPDATE_SCENARIO)
 			end
 		elseif event == "SCENARIO_COMPLETED" then
 			KT.inScenario = false
@@ -270,7 +270,7 @@ local function SetFrames()
 		elseif event == "PLAYER_REGEN_ENABLED" and combatLockdown then
 			combatLockdown = false
 			KT:RemoveFixedButton()
-			ObjectiveTracker_Update()
+			ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.COMBAT_STOP)
 		elseif event == "ZONE_CHANGED_NEW_AREA" or event == "ZONE_CHANGED" then
 			KTF.Buttons.reanchor = (KTF.Buttons.num > 0)
 		elseif event == "UPDATE_BINDINGS" then
@@ -284,7 +284,7 @@ local function SetFrames()
 		elseif event == "PET_BATTLE_CLOSE" then
 			KT:prot("SetShown", KT, true)
 			KT.locked = false
-			ObjectiveTracker_Update()
+			ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.PET_BATTLE_CLOSE)
 		elseif event == "CVAR_UPDATE" then
 			local varName = ...
 			if varName == "autoQuestWatch" then
@@ -368,7 +368,6 @@ local function SetFrames()
 			if self.value > 0 and self.value < OTF.height-db.maxHeight then
 				MSA_CloseDropDownMenus()
 			end
-			KT.Utils.Log("SCROLL ... "..self.value.." ... "..OTF.height.." - "..db.maxHeight)
 		end
 	end)
 	KTF.Scroll = Scroll
@@ -449,7 +448,7 @@ local function SetHooks()
 				local idx = 0
 				local contentsHeight = 0
 				-- Quest items
-				KT.Utils.Log(" - REANCHOR buttons - Q", true)
+				KT.Utils.Log("REANCHOR quest buttons")
 				for i = 1, GetNumQuestWatches() do
 					local questLogIndex = GetQuestIndexForWatch(i)
 					local questID = GetQuestIDFromLogIndex(questLogIndex)
@@ -479,19 +478,22 @@ local function SetHooks()
 	end
 
 	local bck_ObjectiveTracker_Update = ObjectiveTracker_Update
-	ObjectiveTracker_Update = function(reason, id)
+
+	---@param reason number Either a byte that helps update concerned modules or a debug number to log reason
+	---@param itemId number Either a quest or achievement id
+	ObjectiveTracker_Update = function(reason, itemId)
 		if KT.stopUpdate then return end
-		if reason ~= OBJECTIVE_TRACKER_UPDATE_STATIC then
-			local dbgReason
-			if reason == OBJECTIVE_TRACKER_UPDATE_ALL then
-				dbgReason = "FFFFFFFF"
-			else
-				dbgReason = reason and format("%x", reason) or ""
-			end
-			KT.Utils.Log("|cffffff00Update ... "..dbgReason, true)
+
+		if reason and DEBUG_UPDATE_DESCS[reason] then
+			KT.Utils.Log(KT.Utils.AppendCategory("UPDATE", DEBUG_UPDATE_DESCS[reason]))
+		else
+			KT.Utils.LogWarning(KT.Utils.AppendCategory("UPDATE","Update has no reason ! Add one to the dictionnary or default to \"forced\"."))
 		end
-		bck_ObjectiveTracker_Update(reason, id)
-		KT:ToggleEmptyTracker(id)
+
+		if reason and reason < 0 then reason = nil end -- Prevent debug reason to get in the way of bitwise operations
+
+		bck_ObjectiveTracker_Update(reason, itemId)
+		KT:ToggleEmptyTracker(itemId)
 		FixedButtonsReanchor()
 		if dbChar.collapsed then
 			local _, numQuests = GetNumQuestLogEntries()
@@ -808,7 +810,7 @@ local function SetHooks()
 	---@param questID number
 	---@return table|Button|SecureActionButtonTemplate
 	local function CreateQuestButton(questID)
-		KT.Utils.Log("Create new quest for quest : "..questID)
+		KT.Utils.Log("Create new quest button for quest: "..questID)
 		local name = addonName.."Button"..time()..questID
 		local button = CreateFrame("Button", name, KTF.Buttons, "SecureActionButtonTemplate")
 		button:SetSize(26, 26)
@@ -1024,7 +1026,7 @@ local function SetHooks()
 	hooksecurefunc("ObjectiveTracker_OnSlideBlockUpdate", function(block, elapsed)
 		local slideData = block.slideData
 		if block.slideTime >= slideData.duration + (slideData.endDelay or 0) then
-			ObjectiveTracker_Update()	-- update after expand collapsed tracker
+			ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.FORCED)	-- update after expand collapsed tracker
 		end
 	end)
 
@@ -1084,8 +1086,7 @@ local function SetHooks()
 	end
 
 	function ObjectiveTracker_Collapse()  -- R
-		KT.Utils.Log("--------------------------------")
-		KT.Utils.Log("COLLAPSE")
+		KT.Utils.Log("Collaspe Tracker")
 		OTF.collapsed = true
 		dbChar.collapsed = OTF.collapsed
 		OTF.BlocksFrame:Hide()
@@ -1095,8 +1096,7 @@ local function SetHooks()
 	end
 
 	function ObjectiveTracker_Expand()  -- R
-		KT.Utils.Log("--------------------------------")
-		KT.Utils.Log("EXPAND")
+		KT.Utils.Log("Expand Tracker")
 		OTF.collapsed = nil
 		dbChar.collapsed = OTF.collapsed
 		OTF.BlocksFrame:Show()
@@ -1374,7 +1374,7 @@ end
 
 function KT:Update(forced)
 	self:SetForced(forced)
-	ObjectiveTracker_Update()
+	ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.FORCED)
 end
 
 function KT:MinimizeButton_OnClick()

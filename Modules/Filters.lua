@@ -769,7 +769,7 @@ function DropDown_Initialize(self, level)
 				dbChar.quests.sort = arg
 				local listFrame = _G["MSA_DropDownList"..MSA_DROPDOWNMENU_MENU_LEVEL]
 				DropDown_Toggle(MSA_DROPDOWNMENU_MENU_LEVEL, _G["MSA_DropDownList"..listFrame.parentLevel.."Button"..listFrame.parentID])
-				ObjectiveTracker_Update()
+				ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.FILTER_CHANGED)
 			end
 
 			info.text = "Disabled"
@@ -798,7 +798,7 @@ function DropDown_Initialize(self, level)
 				dbChar.quests.sortCompleted = arg
 				local listFrame = _G["MSA_DropDownList"..MSA_DROPDOWNMENU_MENU_LEVEL]
 				DropDown_Toggle(MSA_DROPDOWNMENU_MENU_LEVEL, _G["MSA_DropDownList"..listFrame.parentLevel.."Button"..listFrame.parentID])
-				ObjectiveTracker_Update()
+				ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.FILTER_CHANGED)
 			end
 
 			info.text = "Completed not moved"
@@ -878,7 +878,7 @@ local function SetFrames()
 	if not eventFrame then
 		eventFrame = CreateFrame("Frame")
 		eventFrame:SetScript("OnEvent", function(self, event, arg1, ...)
-			KT.Utils.Log("Event - "..event, true)
+			KT.Utils.Log(KT.Utils.AppendCategory("EVENT",event))
 			if event == "ADDON_LOADED" and arg1 == "Blizzard_AchievementUI" then
 				SetHooks_AchievementUI()
 				self:UnregisterEvent(event)
