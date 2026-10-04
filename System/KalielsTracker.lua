@@ -410,7 +410,7 @@ local function SetFrames()
 	KT:ToggleOtherButtons()
 
 	-- Buttons frame
-	local Buttons = CreateFrame("Frame", addonName.."Buttons", UIParent, "BackdropTemplate")
+	local Buttons = CreateFrame("Frame", addonName.."_QuestButtonBar", UIParent, "BackdropTemplate")
 	Buttons:SetSize(40, 40)
 	Buttons:SetPoint("TOPLEFT", 0, 0)
 	Buttons:SetFrameStrata(db.frameStrata)
@@ -424,15 +424,17 @@ end
 -- Hooks ---------------------------------------------------------------------------------------------------------------
 
 local function SetHooks()
-	local function SetFixedButton(block, idx, height, yOfs)
-		if block.fixedTag and KT.fixedButtons[block.id] then
+	local function SetFixedButton(questBlock, idx, height, yOfs)
+		if questBlock.fixedTag and KT.fixedButtons[questBlock.id] then
+
 			idx = idx + 1
-			block.fixedTag.text:SetText(idx)
-			KT.fixedButtons[block.id].text:SetText(idx)
-			KT.fixedButtons[block.id].num = idx
+			questBlock.fixedTag.text:SetText(idx)
+			KT.fixedButtons[questBlock.id].text:SetText(idx)
+			KT.fixedButtons[questBlock.id].num = idx
+
 			yOfs = -(height + 7)
 			height = height + 26 + 3
-			KT.fixedButtons[block.id]:SetPoint("TOP", 0, yOfs)
+			KT.fixedButtons[questBlock.id]:SetPoint("TOP", 0, yOfs)
 		end
 		return idx, height, yOfs
 	end
@@ -448,7 +450,7 @@ local function SetHooks()
 				local idx = 0
 				local contentsHeight = 0
 				-- Quest items
-				KT.Utils.Log("REANCHOR quest buttons")
+				KT.Utils.Log("Reanchor quest buttons")
 				for i = 1, GetNumQuestWatches() do
 					local questLogIndex = GetQuestIndexForWatch(i)
 					local questID = GetQuestIDFromLogIndex(questLogIndex)
@@ -811,33 +813,33 @@ local function SetHooks()
 	---@return table|Button|SecureActionButtonTemplate
 	local function CreateQuestButton(questID)
 		KT.Utils.Log("Create new quest button for quest: "..questID)
-		local name = addonName.."Button"..time()..questID
+		local name = addonName.."_QuestButton_"..questID
 		local button = CreateFrame("Button", name, KTF.Buttons, "SecureActionButtonTemplate")
 		button:SetSize(26, 26)
 
-		button.icon = button:CreateTexture(name.."Icon", "BORDER")
+		button.icon = button:CreateTexture(name.."_Icon", "BORDER")
 		button.icon:SetAllPoints()
 		button.Icon = button.icon   -- for Spell
 
-		button.Count = button:CreateFontString(name.."Count", "BORDER", "NumberFontNormal")
+		button.Count = button:CreateFontString(name.."_Count", "BORDER", "NumberFontNormal")
 		button.Count:SetJustifyH("RIGHT")
 		button.Count:SetPoint("BOTTOMRIGHT", button.icon, -3, 2)
 
 		button.Cooldown = CreateFrame("Cooldown", name.."Cooldown", button, "CooldownFrameTemplate")
 		button.Cooldown:SetAllPoints()
 
-		button.HotKey = button:CreateFontString(name.."HotKey", "ARTWORK", "NumberFontNormalSmallGray")
+		button.HotKey = button:CreateFontString(name.."_HotKey", "ARTWORK", "NumberFontNormalSmallGray")
 		button.HotKey:SetSize(29, 10)
 		button.HotKey:SetJustifyH("RIGHT")
 		button.HotKey:SetText(RANGE_INDICATOR)
 		button.HotKey:SetPoint("TOPRIGHT", button.icon, 2, -2)
 
-		button.text = button:CreateFontString(name.."Text", "ARTWORK", "NumberFontNormalSmall")
+		button.text = button:CreateFontString(name.."_Text", "ARTWORK", "NumberFontNormalSmall")
 		button.text:SetSize(29, 10)
 		button.text:SetJustifyH("LEFT")
 		button.text:SetPoint("TOPLEFT", button.icon, 1, -3)
 
-		button:RegisterForClicks("AnyUp")
+		button:RegisterForClicks("AnyUp", "AnyDown")
 
 		button:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
 		do local tex = button:GetNormalTexture()
@@ -845,6 +847,7 @@ local function SetHooks()
 			tex:SetPoint("CENTER")
 			tex:SetSize(44, 44)
 		end
+
 		button:SetPushedTexture("Interface\\Buttons\\UI-Quickslot-Depress")
 		button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
 		button:SetFrameLevel(KTF:GetFrameLevel() + 1)
@@ -853,7 +856,7 @@ local function SetHooks()
 		return button;
 	end
 
-	---@param button table|Button|SecureActionButtonTemplate
+	---@param button table|Button
 	---@param isSpell boolean
 	local function BindEventOnQuestButton(button, isSpell)
 		if not isSpell then
@@ -879,7 +882,7 @@ local function SetHooks()
 
 	---@param questID number
 	---@param isSpell boolean
-	---@return table|Button|SecureActionButtonTemplate
+	---@return table|Button
 	local function RecycleOrCreateQuestButton(questID, isSpell)
 		local button
 

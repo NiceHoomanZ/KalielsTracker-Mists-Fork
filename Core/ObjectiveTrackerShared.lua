@@ -1,52 +1,6 @@
-local addonName, addon = ...
+local TOOLTIP_TRACKER_FIND_GROUP_BUTTON, addon = ...
 ---@class KT
 local KT = addon
-
--- *****************************************************************************************************
--- ***** UTIL FUNCTIONS
--- *****************************************************************************************************
--- TODO Keep or remove whole Util section, if keept move it to its own file
-
-local Util = {}
-
-Util.FORMAT_itemid = "item:%d:0:0:0:0:0:0:0"
-Util.PATTERN_itemid = "item:(%-?%d+):%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+"
-Util.PATTERN_itemlink = "|c%x+|H".. Util.PATTERN_itemid .."|h%[.-%]|h|r"
-
----From LibQuestItem addon 
----Get BaseId from item link
----@param link any
----@return number
-function Util.GetBaseId(link)
-	if link then
-		if type(link) == "number" then return link end
-		local baseid = strmatch(link, Util.PATTERN_itemlink)
-		if not baseid then
-			baseid = strmatch(link, Util.PATTERN_itemid)
-		end
-		if not baseid then
-			baseid = link
-		end
-		return tonumber(baseid)
-	end
-	return 0
-end
-
----From LibQuestItem addon
----Get ItemString from baseId
----@param itemId string|number
----@return string
-function Util.GetItemString(itemId)
-	return string.format(Util.FORMAT_itemid, itemId)
-end
-
----Format link to be able to print its real data
----@param link string|unknown
----@return string
-function Util.FormatLink(link)
-	local formattedString = gsub(link, "\124", "\124\124");
-	return formattedString;
-end
 
 -- *****************************************************************************************************
 -- ***** ITEM FUNCTIONS
@@ -69,50 +23,13 @@ function QuestObjectiveItem_ReleaseButton(button)
 	g_questObjectiveItemPool:Release(button);
 end
 
----Set the button icon, charges, rangeTimer, count, item
----@param itemButton Button|unknown
----@param questLogIndex number
-function QuestObjectiveItem_Initialize(itemButton, questLogIndex)
-	-- TODO Keep or remove
-	-- local link, iconID, charges = GetQuestLogSpecialItemInfo(questLogIndex);
-	-- itemButton:SetID(questLogIndex);
-	-- itemButton.link = link;
-	-- itemButton.charges = charges;
-	-- itemButton.rangeTimer = -1;
-	-- SetItemButtonTexture(itemButton, iconID);
-	-- SetItemButtonCount(itemButton, charges);
-
-	-- -- Using link, itemName, itemId yield the same result
-	-- itemButton:SetAttribute("item", link)
-
-	QuestObjectiveItem_UpdateCooldown(itemButton);
-end
-
-function QuestObjectiveItem_OnLoad(self)
-	self:RegisterForClicks("AnyUp");
-end
-
--- TODO Update once fix
---- It doesn't work because the "UseQuestLogSpecialItem" WoW function is bugged on this version :
---- It "taints" (modify) the C code on execution so it needs a workaround.
---- The bug is well known.
---- https://warcraft.wiki.gg/wiki/SecureActionButtonTemplate
----@param button Button
----@param mouseButton string
-function QuestObjectiveItem_OnClick(button, mouseButton)
-	KT.Utils.Log("QuestObjectiveItem_OnClick"..
-	" Type => "..(button:GetAttribute("type*") or "Nil")..
-	" Item => " .. (button:GetAttribute("item") or "Nil"))
-
+---@param questButton Button
+function QuestObjectiveItem_OnClick(questButton)
 	if ( IsModifiedClick("CHATLINK") and ChatEdit_GetActiveWindow() ) then
-		local link = GetQuestLogSpecialItemInfo(button:GetID());
+		local link = GetQuestLogSpecialItemInfo(questButton:GetID());
 		if ( link ) then
 			ChatEdit_InsertLink(link);
 		end
-	else
-		-- TODO Keep or remove
-		-- print("buttinId => " .. button:GetID())
-		-- UseQuestLogSpecialItem(button:GetID());			-- Protected function
 	end
 end
 
@@ -273,7 +190,6 @@ function QuestObjectiveSetupBlockButton_Item(block, questLogIndex, isQuestComple
 			block.itemButton = itemButton;
 		end
 
-		QuestObjectiveItem_Initialize(itemButton, questLogIndex);
 		QuestObjectiveSetupBlockButton_AddRightButton(block, itemButton, block.module.buttonOffsets.useItem);
 	else
 		QuestObjectiveReleaseBlockButton_Item(block);

@@ -3,8 +3,7 @@
 
 	<Script file="ObjectiveTrackerShared.lua"/>
 
-	<!-- TODO Keep or remove the whole template -->
-	<!-- inherits="SecureActionButtonTemplate" -->
+	<!-- TODO Keep or remove the whole template / feature -->
 	<Button name="QuestObjectiveItemButtonTemplate" virtual="true">
 		<Size x="26" y="26"/>
 		<Layers>
@@ -29,7 +28,6 @@
 			<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate"/>
 		</Frames>
 		<Scripts>
-			<OnLoad function="QuestObjectiveItem_OnLoad"/>
 			<OnEvent function="QuestObjectiveItem_OnEvent"/>
 			<OnUpdate function="QuestObjectiveItem_OnUpdate"/>
 			<OnShow function="QuestObjectiveItem_OnShow"/>
