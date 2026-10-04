@@ -24,7 +24,6 @@ local tonumber = tonumber
 local Utils = {}
 KT.Utils = Utils
 
--- TODO Add documentation for it (which addon and version are use for debug)
 -- TODO Test the category thing
 local function DebugLog(...)
     if DLAPI == nil then return end
