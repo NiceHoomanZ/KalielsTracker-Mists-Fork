@@ -1,3 +1,7 @@
+local addonName, addon = ...
+---@class KT
+local KT = addon
+
 -- *****************************************************************************************************
 -- ***** UTIL FUNCTIONS
 -- *****************************************************************************************************
@@ -115,6 +119,7 @@ function QuestObjectiveItem_OnLoad(self)
 	self:RegisterForClicks("AnyUp");
 end
 
+-- TODO Update once fix
 --- It doesn't work because the "UseQuestLogSpecialItem" WoW function is bugged on this version :
 --- It "taints" (modify) the C code on execution so it needs a workaround.
 --- The bug is well known.
@@ -122,9 +127,9 @@ end
 ---@param button Button
 ---@param mouseButton string
 function QuestObjectiveItem_OnClick(button, mouseButton)
-	print("-------------------")
-	print("Button type => "..(button:GetAttribute("type*") or "Nil")
-		.." Button item => " .. (button:GetAttribute("item") or "Nil"))
+	KT.Utils.Log("QuestObjectiveItem_OnClick"..
+	" Type => "..(button:GetAttribute("type*") or "Nil")..
+	" Item => " .. (button:GetAttribute("item") or "Nil"))
 
 	if ( IsModifiedClick("CHATLINK") and ChatEdit_GetActiveWindow() ) then
 		local link = GetQuestLogSpecialItemInfo(button:GetID());

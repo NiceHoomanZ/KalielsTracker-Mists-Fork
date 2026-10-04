@@ -804,89 +804,117 @@ local function SetHooks()
 		tag.text:SetTextColor(colorStyle.r, colorStyle.g, colorStyle.b)
 	end
 
-	local function CreateFixedButton(block, isSpell)
+	---Create quest button visual
+	---@param questID number
+	---@return table|Button|SecureActionButtonTemplate
+	local function CreateQuestButton(questID)
+		KT.Utils.Log("Create new quest for quest : "..questID)
+		local name = addonName.."Button"..time()..questID
+		local button = CreateFrame("Button", name, KTF.Buttons, "SecureActionButtonTemplate")
+		button:SetSize(26, 26)
+
+		button.icon = button:CreateTexture(name.."Icon", "BORDER")
+		button.icon:SetAllPoints()
+		button.Icon = button.icon   -- for Spell
+
+		button.Count = button:CreateFontString(name.."Count", "BORDER", "NumberFontNormal")
+		button.Count:SetJustifyH("RIGHT")
+		button.Count:SetPoint("BOTTOMRIGHT", button.icon, -3, 2)
+
+		button.Cooldown = CreateFrame("Cooldown", name.."Cooldown", button, "CooldownFrameTemplate")
+		button.Cooldown:SetAllPoints()
+
+		button.HotKey = button:CreateFontString(name.."HotKey", "ARTWORK", "NumberFontNormalSmallGray")
+		button.HotKey:SetSize(29, 10)
+		button.HotKey:SetJustifyH("RIGHT")
+		button.HotKey:SetText(RANGE_INDICATOR)
+		button.HotKey:SetPoint("TOPRIGHT", button.icon, 2, -2)
+
+		button.text = button:CreateFontString(name.."Text", "ARTWORK", "NumberFontNormalSmall")
+		button.text:SetSize(29, 10)
+		button.text:SetJustifyH("LEFT")
+		button.text:SetPoint("TOPLEFT", button.icon, 1, -3)
+
+		button:RegisterForClicks("AnyUp")
+
+		button:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
+		do local tex = button:GetNormalTexture()
+			tex:ClearAllPoints()
+			tex:SetPoint("CENTER")
+			tex:SetSize(44, 44)
+		end
+		button:SetPushedTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+		button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
+		button:SetFrameLevel(KTF:GetFrameLevel() + 1)
+		button:Hide()
+
+		return button;
+	end
+
+	---@param button table|Button|SecureActionButtonTemplate
+	---@param isSpell boolean
+	local function BindEventOnQuestButton(button, isSpell)
+		if not isSpell then
+			button:SetScript("OnEvent", QuestObjectiveItem_OnEvent)
+			button:SetScript("OnUpdate", QuestObjectiveItem_OnUpdate)
+			button:SetScript("OnShow", QuestObjectiveItem_OnShow)
+			button:SetScript("OnHide", QuestObjectiveItem_OnHide)
+			button:SetScript("OnEnter", QuestObjectiveItem_OnEnter)
+			button:SetScript("OnLeave", QuestObjectiveItem_OnLeave)
+		else
+			button.HotKey:Hide()
+			button:SetScript("OnEvent", nil)
+			button:SetScript("OnUpdate", nil)
+			button:SetScript("OnShow", nil)
+			button:SetScript("OnHide", nil)
+			button:SetScript("OnEnter", ScenarioSpellButton_OnEnter)
+			button:SetScript("OnLeave", GameTooltip_Hide)
+		end
+
+		button:SetScript("OnMouseDown", QuestObjectiveItem_OnClick)
+		button:SetAttribute("type*", isSpell and "spell" or "item")
+	end
+
+	---@param questID number
+	---@param isSpell boolean
+	---@return table|Button|SecureActionButtonTemplate
+	local function RecycleOrCreateQuestButton(questID, isSpell)
+		local button
+
+		local numFreeButtons = #freeButtons
+		if numFreeButtons > 0 then
+			KT.Utils.Log("Use existing free button for quest : "..questID)
+			button = freeButtons[numFreeButtons]
+			tremove(freeButtons, numFreeButtons)
+		else
+			button = CreateQuestButton(questID)
+		end
+
+		BindEventOnQuestButton(button, isSpell)
+
+		return button
+	end
+
+	local function GetOrCreateQuestButton(block, isSpell)
 		local questID = block.id
 		local button = KT:GetFixedButton(questID)
 		if not button then
 			if InCombatLockdown() then
-				KT.Utils.Log(" - STOP Create button")
+				KT.Utils.LogWarning("Prevent creating quest button during combat !")
 				combatLockdown = true
 				return nil
 			end
 
-			local numFreeButtons = #freeButtons
-			if numFreeButtons > 0 then
-				KT.Utils.Log(" - USE button "..questID)
-				button = freeButtons[numFreeButtons]
-				tremove(freeButtons, numFreeButtons)
-			else
-				KT.Utils.Log(" - CREATE button "..questID)
-				local name = addonName.."Button"..time()..questID
-				button = CreateFrame("Button", name, KTF.Buttons, "SecureActionButtonTemplate")
-				button:SetSize(26, 26)
+			button = RecycleOrCreateQuestButton(questID, isSpell)
 
-				button.icon = button:CreateTexture(name.."Icon", "BORDER")
-				button.icon:SetAllPoints()
-                button.Icon = button.icon   -- for Spell
-
-				button.Count = button:CreateFontString(name.."Count", "BORDER", "NumberFontNormal")
-				button.Count:SetJustifyH("RIGHT")
-				button.Count:SetPoint("BOTTOMRIGHT", button.icon, -3, 2)
-
-				button.Cooldown = CreateFrame("Cooldown", name.."Cooldown", button, "CooldownFrameTemplate")
-				button.Cooldown:SetAllPoints()
-
-				button.HotKey = button:CreateFontString(name.."HotKey", "ARTWORK", "NumberFontNormalSmallGray")
-				button.HotKey:SetSize(29, 10)
-				button.HotKey:SetJustifyH("RIGHT")
-				button.HotKey:SetText(RANGE_INDICATOR)
-				button.HotKey:SetPoint("TOPRIGHT", button.icon, 2, -2)
-
-				button.text = button:CreateFontString(name.."Text", "ARTWORK", "NumberFontNormalSmall")
-				button.text:SetSize(29, 10)
-				button.text:SetJustifyH("LEFT")
-				button.text:SetPoint("TOPLEFT", button.icon, 1, -3)
-
-				button:RegisterForClicks("AnyUp")
-
-				button:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
-				do local tex = button:GetNormalTexture()
-					tex:ClearAllPoints()
-					tex:SetPoint("CENTER")
-					tex:SetSize(44, 44)
-				end
-				button:SetPushedTexture("Interface\\Buttons\\UI-Quickslot-Depress")
-				button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
-				button:SetFrameLevel(KTF:GetFrameLevel() + 1)
-				button:Hide()	-- Cooldown init
-            end
-
-            if not isSpell then
-				button:SetScript("OnEvent", QuestObjectiveItem_OnEvent)
-				button:SetScript("OnUpdate", QuestObjectiveItem_OnUpdate)
-				button:SetScript("OnShow", QuestObjectiveItem_OnShow)
-				button:SetScript("OnHide", QuestObjectiveItem_OnHide)
-				button:SetScript("OnEnter", QuestObjectiveItem_OnEnter)
-				button:SetScript("OnLeave", QuestObjectiveItem_OnLeave)
-			else
-				button.HotKey:Hide()
-				button:SetScript("OnEvent", nil)
-				button:SetScript("OnUpdate", nil)
-				button:SetScript("OnShow", nil)
-				button:SetScript("OnHide", nil)
-				button:SetScript("OnEnter", ScenarioSpellButton_OnEnter)
-				button:SetScript("OnLeave", GameTooltip_Hide)
-			end
-
-			button:SetScript("OnMouseDown", QuestObjectiveItem_OnClick)
-
-            button:SetAttribute("type*", isSpell and "spell" or "item")
 			button:Show()
 			KT.fixedButtons[questID] = button
 			KTF.Buttons.reanchor = true
 		end
+
 		button.block = block
 		button:SetAlpha(1)
+
 		return button
 	end
 
@@ -913,7 +941,7 @@ local function SetHooks()
 		if item and (not isQuestComplete or showItemWhenComplete) then
 			block.itemButton:Hide()
 			CreateFixedTag(block, 3, 4)
-			local button = CreateFixedButton(block)
+			local button = GetOrCreateQuestButton(block)
 			if not InCombatLockdown() then
 				button:SetID(questLogIndex)
 				button.charges = charges
