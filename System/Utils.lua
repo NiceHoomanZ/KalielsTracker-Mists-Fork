@@ -42,6 +42,36 @@ function Utils.LogError(...)
     DebugLog("ERROR~" .. ...)
 end
 
+---@param object any
+---@param depth number?
+---@param current number?
+function Utils.Dump(object, depth, current)
+    if depth == nil then depth = 1 end
+	if current == nil then current = 0 end
+
+	if type(object) == 'table' then
+		if(current > depth) then return "TABLE" end
+
+		local s = '{ '
+      for k,v in pairs(object) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. Utils.Dump(v, depth, current + 1) .. ','
+      end
+      return s .. '} '
+   else
+		return tostring(object)
+   end
+end
+
+---The object or the string "Nil"
+---@param any any
+---@return string
+function Utils.OrNil(any)
+    if any == nil then return "Nil" end
+
+    return any
+end
+
 ---Append category to a log message
 ---@param category string
 function Utils.AppendCategory(category, ...)

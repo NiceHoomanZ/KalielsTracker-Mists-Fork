@@ -13,33 +13,6 @@ Util.FORMAT_itemid = "item:%d:0:0:0:0:0:0:0"
 Util.PATTERN_itemid = "item:(%-?%d+):%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+:%-?%d+"
 Util.PATTERN_itemlink = "|c%x+|H".. Util.PATTERN_itemid .."|h%[.-%]|h|r"
 
----@param object any
----@param depth number
----@param current number?
-function Util.Dump(object, depth, current)
-	if current == nil then current = 0 end
-
-	if type(object) == 'table' then
-		if(current > depth) then return "TABLE" end
-
-		local s = '{ '
-      for k,v in pairs(object) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. Util.Dump(v, depth, current + 1) .. ','
-      end
-      return s .. '} '
-   else
-		return tostring(object)
-   end
-end
-
----@param object any
----@param depth number?
-function Util.PrintDump(object, depth)
-	if depth == nil then depth = 1 end
-	print(Util.Dump(object, depth))
-end
-
 ---From LibQuestItem addon 
 ---Get BaseId from item link
 ---@param link any
