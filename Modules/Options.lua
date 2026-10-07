@@ -24,6 +24,7 @@ local pairs = pairs
 local strsplit = string.split
 local strsub = string.sub
 
+---@class DB
 local db
 local anchors = { "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT" }
 local strata = { "LOW", "MEDIUM", "HIGH" }
@@ -979,6 +980,40 @@ local options = {
 								db.soundQuestComplete = value
 							end,
 							order = 8.11,
+						},
+						soundKitToggle = {
+							name = "Use Sound Kit",
+							type = "toggle",
+							set = function()
+								db.useSoundKit = not db.useSoundKit
+							end,
+							order = 8.2,
+							width = 1.2,
+						},
+						useSoundKitButton = {
+							name = "Test Sound Kit",
+							type = "execute",							
+							disabled = function() return db.useSoundKit == false end,
+							func = function()
+								 KT.PlaySoundKit(db.selectedSoundKit)
+							end,
+							order = 8.21,
+							width = 1.2,
+						};
+						soundKitSelect = {
+							name = "Random Sound",
+							desc = "Sound kits",
+							type = "select",
+							values =  KT.GetAvailableSoundKitNames(),
+							disabled = function() return db.useSoundKit == false end,
+							get = function()
+								return db.selectedSoundKit
+							end,
+							set = function(_, value)
+								db.selectedSoundKit = value
+							end,
+							order = 8.22,
+							width = 1.2,
 						},
 					},
 				},

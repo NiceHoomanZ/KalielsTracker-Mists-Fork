@@ -61,6 +61,18 @@ local function GetAvailableSoundKits()
     return availableSoundKits
 end
 
-for index, value in ipairs(GetAvailableSoundKits()) do
-    KT.Utils.Log(value.Name)
+function KT.GetAvailableSoundKitNames()
+    local availableSoundKitNames = {}
+
+    for index, soundKit in ipairs(GetAvailableSoundKits()) do
+        availableSoundKitNames[index] = soundKit.Name
+    end
+
+    return availableSoundKitNames
+end
+
+
+function KT.PlaySoundKit(index)
+    local sk = GetAvailableSoundKits()[index]
+    PlaySound(sk.SoundKitId, "SFX");
 end
