@@ -620,6 +620,7 @@ local function SetHooks()
 						KT:SetMessage(block.title, 0, 1, 0, ERR_QUEST_COMPLETE_S, "Interface\\GossipFrame\\ActiveQuestIcon", -2, 0)
 					end
 					if db.soundQuest then
+						-- TODO Where we play sound
 						KT:PlaySound(db.soundQuestComplete)
 					end
 					KT.QuestsCache_SetProperty(block.id, "state", "complete")

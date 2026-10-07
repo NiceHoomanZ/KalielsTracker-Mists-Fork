@@ -18,17 +18,13 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local WidgetLists = AceGUIWidgetLSMlists
 
 -- Lua API
-local floor = math.floor
-local fmod = math.fmod
-local format = string.format
 local gsub = string.gsub
 local ipairs = ipairs
 local pairs = pairs
-local strlen = string.len
 local strsplit = string.split
 local strsub = string.sub
 
-local db, dbChar
+local db
 local anchors = { "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT" }
 local strata = { "LOW", "MEDIUM", "HIGH" }
 local flags = { [""] = "None", ["OUTLINE"] = "Outline", ["OUTLINE, MONOCHROME"] = "Outline Monochrome" }
@@ -39,7 +35,6 @@ local ICON_HEART = "|T"..KT.MEDIA_PATH.."Help\\help_patreon:14:14:0:0:256:32:174
 local cTitle = " "..NORMAL_FONT_COLOR_CODE
 local cBold = "|cff00ffe3"
 local cWarning = "|cffff7f00"
-local beta = "|cffff7fff[Beta]|r"
 local warning = cWarning.."Warning:|r UI will be re-loaded!"
 
 local KTF = KT.frame
@@ -50,7 +45,7 @@ local overlayShown = false
 
 local _, numQuests = GetNumQuestLogEntries()
 
-local OverlayFrameUpdate, OverlayFrameHide, GetModulesOptionsTable, MoveModule, SetSharedColor, IsSpecialLocale	-- functions
+local OverlayFrameUpdate, OverlayFrameHide, GetModulesOptionsTable, MoveModule, SetSharedColor	-- functions
 
 local defaults = {
 	profile = {
@@ -960,6 +955,7 @@ local options = {
 					type = "group",
 					inline = true,
 					order = 8,
+					-- TODO Where sounds options are created
 					args = {
 						soundQuest = {
 							name = "Quest sounds",
