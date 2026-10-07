@@ -40,7 +40,9 @@ local freeTags = {}
 local freeButtons = {}
 local msgPatterns = {}
 local combatLockdown = false
-local db, dbChar
+---@type KT.Profile
+local db
+local dbChar
 
 -- Main frame
 local KTF = CreateFrame("Frame", addonName.."Frame", UIParent, "BackdropTemplate")
@@ -620,8 +622,7 @@ local function SetHooks()
 						KT:SetMessage(block.title, 0, 1, 0, ERR_QUEST_COMPLETE_S, "Interface\\GossipFrame\\ActiveQuestIcon", -2, 0)
 					end
 					if db.soundQuest then
-						-- TODO Where we play sound
-						KT:PlaySound(db.soundQuestComplete)
+						KT.PlayQuestCompletedSound()
 					end
 					KT.QuestsCache_SetProperty(block.id, "state", "complete")
 				end
@@ -637,6 +638,14 @@ local function SetHooks()
 		end
 
 		return line;
+	end
+
+	function KT.PlayQuestCompletedSound()
+		if db.useSoundKit == false then
+			KT:PlaySound(db.soundQuestComplete)
+		else
+			KT.SoundKitHelper.PlaySoundKit(db.useRandomSoundKit, db.selectedSoundKit)
+		end
 	end
 
 	function DEFAULT_OBJECTIVE_TRACKER_MODULE:SetStringText(fontString, text, useFullHeight, colorStyle, useHighlight)  -- RO

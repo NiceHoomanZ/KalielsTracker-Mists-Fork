@@ -9,7 +9,6 @@ local _, KT = ...
 
 local LSM = LibStub("LibSharedMedia-3.0")
 
--- TODO Where we register sounds
 local function RegisterMedia(media)
     for _, item in ipairs(media) do
         LSM:Register(LSM.MediaType[item.type], "KT - "..item.name, item.filePath)

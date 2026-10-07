@@ -24,8 +24,10 @@ local pairs = pairs
 local strsplit = string.split
 local strsub = string.sub
 
----@class DB
-local db
+---@class KT.Profile
+---@field selectedSoundKit integer
+---@field useRandomSoundKit boolean
+local profile
 local anchors = { "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT" }
 local strata = { "LOW", "MEDIUM", "HIGH" }
 local flags = { [""] = "None", ["OUTLINE"] = "Outline", ["OUTLINE, MONOCHROME"] = "Outline Monochrome" }
@@ -48,6 +50,8 @@ local _, numQuests = GetNumQuestLogEntries()
 
 local OverlayFrameUpdate, OverlayFrameHide, GetModulesOptionsTable, MoveModule, SetSharedColor	-- functions
 
+---@class DEFAULT_OPTIONS
+---@field profile KT.Profile
 local defaults = {
 	profile = {
 		anchorPoint = "TOPRIGHT",
@@ -100,6 +104,9 @@ local defaults = {
 		sink20Sticky = false,
 		soundQuest = true,
 		soundQuestComplete = "KT - Default",
+		useSoundKit = false,
+		useRandomSoundKit = true,
+		selectedSoundKit = 0,
 
 		questsHeaderTitleAppend = true,
 		questsShowLevels = true,
@@ -131,7 +138,7 @@ local defaults = {
 local options = {
 	name = "|T"..KT.MEDIA_PATH.."KT_logo:22:22:-1:7|t"..KT.TITLE,
 	type = "group",
-	get = function(info) return db[info[#info]] end,
+	get = function(info) return profile[info[#info]] end,
 	args = {
 		general = {
 			name = "Options",
@@ -226,15 +233,15 @@ local options = {
 							values = anchors,
 							get = function()
 								for k, v in ipairs(anchors) do
-									if db.anchorPoint == v then
+									if profile.anchorPoint == v then
 										return k
 									end
 								end
 							end,
 							set = function(_, value)
-								db.anchorPoint = anchors[value]
-								db.xOffset = 0
-								db.yOffset = 0
+								profile.anchorPoint = anchors[value]
+								profile.xOffset = 0
+								profile.yOffset = 0
 								KT:MoveTracker()
 								OverlayFrameUpdate()
 							end,
@@ -248,7 +255,7 @@ local options = {
 							max = 0,
 							step = 1,
 							set = function(_, value)
-								db.xOffset = value
+								profile.xOffset = value
 								KT:MoveTracker()
 							end,
 							order = 1.2,
@@ -261,7 +268,7 @@ local options = {
 							max = 0,
 							step = 2,
 							set = function(_, value)
-								db.yOffset = value
+								profile.yOffset = value
 								KT:MoveTracker()
 								KT:SetSize()
 								OverlayFrameUpdate()
@@ -276,7 +283,7 @@ local options = {
 							max = 100,
 							step = 2,
 							set = function(_, value)
-								db.maxHeight = value
+								profile.maxHeight = value
 								KT:SetSize()
 								OverlayFrameUpdate()
 							end,
@@ -316,8 +323,8 @@ local options = {
 							desc = "Show scroll indicator when srolling is enabled. Color is shared with border.",
 							type = "toggle",
 							set = function()
-								db.frameScrollbar = not db.frameScrollbar
-								KTF.Bar:SetShown(db.frameScrollbar)
+								profile.frameScrollbar = not profile.frameScrollbar
+								KTF.Bar:SetShown(profile.frameScrollbar)
 								KT:SetSize()
 							end,
 							order = 1.7,
@@ -329,13 +336,13 @@ local options = {
 							values = strata,
 							get = function()
 								for k, v in ipairs(strata) do
-									if db.frameStrata == v then
+									if profile.frameStrata == v then
 										return k
 									end
 								end
 							end,
 							set = function(_, value)
-								db.frameStrata = strata[value]
+								profile.frameStrata = strata[value]
 								KTF:SetFrameStrata(strata[value])
 								KTF.Buttons:SetFrameStrata(strata[value])
 							end,
@@ -355,7 +362,7 @@ local options = {
 							dialogControl = "LSM30_Background",
 							values = WidgetLists.background,
 							set = function(_, value)
-								db.bgr = value
+								profile.bgr = value
 								KT:SetBackground()
 							end,
 							order = 2.1,
@@ -365,13 +372,13 @@ local options = {
 							type = "color",
 							hasAlpha = true,
 							get = function()
-								return db.bgrColor.r, db.bgrColor.g, db.bgrColor.b, db.bgrColor.a
+								return profile.bgrColor.r, profile.bgrColor.g, profile.bgrColor.b, profile.bgrColor.a
 							end,
 							set = function(_, r, g, b, a)
-								db.bgrColor.r = r
-								db.bgrColor.g = g
-								db.bgrColor.b = b
-								db.bgrColor.a = a
+								profile.bgrColor.r = r
+								profile.bgrColor.g = g
+								profile.bgrColor.b = b
+								profile.bgrColor.a = a
 								KT:SetBackground()
 							end,
 							order = 2.2,
@@ -388,7 +395,7 @@ local options = {
 							dialogControl = "LSM30_Border",
 							values = WidgetLists.border,
 							set = function(_, value)
-								db.border = value
+								profile.border = value
 								KT:SetBackground()
 								KT:MoveButtons()
 							end,
@@ -398,21 +405,21 @@ local options = {
 							name = "Border color",
 							type = "color",
 							disabled = function()
-								return db.classBorder
+								return profile.classBorder
 							end,
 							get = function()
-								if not db.classBorder then
-									SetSharedColor(db.borderColor)
+								if not profile.classBorder then
+									SetSharedColor(profile.borderColor)
 								end
-								return db.borderColor.r, db.borderColor.g, db.borderColor.b
+								return profile.borderColor.r, profile.borderColor.g, profile.borderColor.b
 							end,
 							set = function(_, r, g, b)
-								db.borderColor.r = r
-								db.borderColor.g = g
-								db.borderColor.b = b
+								profile.borderColor.r = r
+								profile.borderColor.g = g
+								profile.borderColor.b = b
 								KT:SetBackground()
 								KT:SetText()
-								SetSharedColor(db.borderColor)
+								SetSharedColor(profile.borderColor)
 							end,
 							order = 2.4,
 						},
@@ -420,13 +427,13 @@ local options = {
 							name = "Border color by |cff%sClass|r",
 							type = "toggle",
 							get = function(info)
-								if db[info[#info]] then
+								if profile[info[#info]] then
 									SetSharedColor(KT.classColor)
 								end
-								return db[info[#info]]
+								return profile[info[#info]]
 							end,
 							set = function()
-								db.classBorder = not db.classBorder
+								profile.classBorder = not profile.classBorder
 								KT:SetBackground()
 								KT:SetText()
 							end,
@@ -440,7 +447,7 @@ local options = {
 							max = 1,
 							step = 0.05,
 							set = function(_, value)
-								db.borderAlpha = value
+								profile.borderAlpha = value
 								KT:SetBackground()
 							end,
 							order = 2.6,
@@ -453,7 +460,7 @@ local options = {
 							max = 24,
 							step = 0.5,
 							set = function(_, value)
-								db.borderThickness = value
+								profile.borderThickness = value
 								KT:SetBackground()
 							end,
 							order = 2.7,
@@ -466,7 +473,7 @@ local options = {
 							max = 10,
 							step = 0.5,
 							set = function(_, value)
-								db.bgrInset = value
+								profile.bgrInset = value
 								KT:SetBackground()
 								KT:MoveButtons()
 							end,
@@ -478,7 +485,7 @@ local options = {
 							dialogControl = "LSM30_Statusbar",
 							values = WidgetLists.statusbar,
 							set = function(_, value)
-								db.progressBar = value
+								profile.progressBar = value
 								KT:SendSignal("OPTIONS_CHANGED", true)
 							end,
 							order = 2.9,
@@ -497,7 +504,7 @@ local options = {
 							dialogControl = "LSM30_Font",
 							values = WidgetLists.font,
 							set = function(_, value)
-								db.font = value
+								profile.font = value
 								KT:SetText(true)
 								KT:SendSignal("OPTIONS_CHANGED")
 							end,
@@ -510,7 +517,7 @@ local options = {
 							max = 24,
 							step = 1,
 							set = function(_, value)
-								db.fontSize = value
+								profile.fontSize = value
 								KT:SetText(true)
 								KT:SendSignal("OPTIONS_CHANGED")
 							end,
@@ -522,13 +529,13 @@ local options = {
 							values = flags,
 							get = function()
 								for k, v in pairs(flags) do
-									if db.fontFlag == k then
+									if profile.fontFlag == k then
 										return k
 									end
 								end
 							end,
 							set = function(_, value)
-								db.fontFlag = value
+								profile.fontFlag = value
 								KT:SetText(true)
 								KT:SendSignal("OPTIONS_CHANGED")
 							end,
@@ -541,10 +548,10 @@ local options = {
 							confirm = true,
 							confirmText = warning,
 							get = function()
-								return (db.fontShadow == 1)
+								return (profile.fontShadow == 1)
 							end,
 							set = function(_, value)
-								db.fontShadow = value and 1 or 0
+								profile.fontShadow = value and 1 or 0
 								ReloadUI()	-- WTF
 							end,
 							order = 3.4,
@@ -554,7 +561,7 @@ local options = {
 							desc = "Quest titles color by difficulty.",
 							type = "toggle",
 							set = function()
-								db.colorDifficulty = not db.colorDifficulty
+								profile.colorDifficulty = not profile.colorDifficulty
 								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 3.5,
@@ -564,7 +571,7 @@ local options = {
 							desc = "Long texts shows on two lines or on one line with ellipsis (...).",
 							type = "toggle",
 							set = function()
-								db.textWordWrap = not db.textWordWrap
+								profile.textWordWrap = not profile.textWordWrap
 								KT:SendSignal("OPTIONS_CHANGED", true)
 								KT:SendSignal("OPTIONS_CHANGED")
 							end,
@@ -591,13 +598,13 @@ local options = {
 							values = textures,
 							get = function()
 								for k, v in ipairs(textures) do
-									if db.headerBgr == k then
+									if profile.headerBgr == k then
 										return k
 									end
 								end
 							end,
 							set = function(_, value)
-								db.headerBgr = value
+								profile.headerBgr = value
 								KT:SetBackground()
 							end,
 							order = 4.11,
@@ -608,15 +615,15 @@ local options = {
 							type = "color",
 							width = "half",
 							disabled = function()
-								return (db.headerBgr < 3 or db.headerBgrColorShare)
+								return (profile.headerBgr < 3 or profile.headerBgrColorShare)
 							end,
 							get = function()
-								return db.headerBgrColor.r, db.headerBgrColor.g, db.headerBgrColor.b
+								return profile.headerBgrColor.r, profile.headerBgrColor.g, profile.headerBgrColor.b
 							end,
 							set = function(_, r, g, b)
-								db.headerBgrColor.r = r
-								db.headerBgrColor.g = g
-								db.headerBgrColor.b = b
+								profile.headerBgrColor.r = r
+								profile.headerBgrColor.g = g
+								profile.headerBgrColor.b = b
 								KT:SetBackground()
 							end,
 							order = 4.12,
@@ -626,10 +633,10 @@ local options = {
 							desc = "The color of texture is shared with the border color.",
 							type = "toggle",
 							disabled = function()
-								return (db.headerBgr < 3)
+								return (profile.headerBgr < 3)
 							end,
 							set = function()
-								db.headerBgrColorShare = not db.headerBgrColorShare
+								profile.headerBgrColorShare = not profile.headerBgrColorShare
 								KT:SetBackground()
 							end,
 							order = 4.13,
@@ -648,15 +655,15 @@ local options = {
 							width = "half",
 							disabled = function()
 								KT:SetText()
-								return (db.headerBgr == 2 or db.headerTxtColorShare)
+								return (profile.headerBgr == 2 or profile.headerTxtColorShare)
 							end,
 							get = function()
-								return db.headerTxtColor.r, db.headerTxtColor.g, db.headerTxtColor.b
+								return profile.headerTxtColor.r, profile.headerTxtColor.g, profile.headerTxtColor.b
 							end,
 							set = function(_, r, g, b)
-								db.headerTxtColor.r = r
-								db.headerTxtColor.g = g
-								db.headerTxtColor.b = b
+								profile.headerTxtColor.r = r
+								profile.headerTxtColor.g = g
+								profile.headerTxtColor.b = b
 								KT:SetText()
 							end,
 							order = 4.21,
@@ -666,10 +673,10 @@ local options = {
 							desc = "The color of header texts is shared with the border color.",
 							type = "toggle",
 							disabled = function()
-								return (db.headerBgr == 2)
+								return (profile.headerBgr == 2)
 							end,
 							set = function()
-								db.headerTxtColorShare = not db.headerTxtColorShare
+								profile.headerTxtColorShare = not profile.headerTxtColorShare
 								KT:SetText()
 							end,
 							order = 4.22,
@@ -693,15 +700,15 @@ local options = {
 							type = "color",
 							width = "half",
 							disabled = function()
-								return db.headerBtnColorShare
+								return profile.headerBtnColorShare
 							end,
 							get = function()
-								return db.headerBtnColor.r, db.headerBtnColor.g, db.headerBtnColor.b
+								return profile.headerBtnColor.r, profile.headerBtnColor.g, profile.headerBtnColor.b
 							end,
 							set = function(_, r, g, b)
-								db.headerBtnColor.r = r
-								db.headerBtnColor.g = g
-								db.headerBtnColor.b = b
+								profile.headerBtnColor.r = r
+								profile.headerBtnColor.g = g
+								profile.headerBtnColor.b = b
 								KT:SetBackground()
 							end,
 							order = 4.31,
@@ -711,7 +718,7 @@ local options = {
 							desc = "The color of all header buttons is shared with the border color.",
 							type = "toggle",
 							set = function()
-								db.headerBtnColorShare = not db.headerBtnColorShare
+								profile.headerBtnColorShare = not profile.headerBtnColorShare
 								KT:SetBackground()
 							end,
 							order = 4.32,
@@ -740,10 +747,10 @@ local options = {
 							type = "toggle",
 							width = "half",
 							get = function()
-								return (db.headerCollapsedTxt == 1)
+								return (profile.headerCollapsedTxt == 1)
 							end,
 							set = function()
-								db.headerCollapsedTxt = 1
+								profile.headerCollapsedTxt = 1
 								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 4.41,
@@ -753,10 +760,10 @@ local options = {
 							type = "toggle",
 							width = "half",
 							get = function()
-								return (db.headerCollapsedTxt == 2)
+								return (profile.headerCollapsedTxt == 2)
 							end,
 							set = function()
-								db.headerCollapsedTxt = 2
+								profile.headerCollapsedTxt = 2
 								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 4.42,
@@ -765,10 +772,10 @@ local options = {
 							name = ("%d/%d Quests"):format(numQuests, MAX_QUESTLOG_QUESTS),
 							type = "toggle",
 							get = function()
-								return (db.headerCollapsedTxt == 3)
+								return (profile.headerCollapsedTxt == 3)
 							end,
 							set = function()
-								db.headerCollapsedTxt = 3
+								profile.headerCollapsedTxt = 3
 								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 4.43,
@@ -778,7 +785,7 @@ local options = {
 							type = "toggle",
 							width = "double",
 							set = function()
-								db.headerOtherButtons = not db.headerOtherButtons
+								profile.headerOtherButtons = not profile.headerOtherButtons
 								KT:ToggleOtherButtons()
 								KT:SetBackground()
 								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
@@ -789,7 +796,7 @@ local options = {
 							name = "Key - Minimize button",
 							type = "keybinding",
 							set = function(_, value)
-								SetOverrideBinding(KTF, false, db.keyBindMinimize, nil)
+								SetOverrideBinding(KTF, false, profile.keyBindMinimize, nil)
 								if value ~= "" then
 									local key = GetBindingKey("EXTRAACTIONBUTTON1")
 									if key == value then
@@ -798,7 +805,7 @@ local options = {
 									end
 									SetOverrideBindingClick(KTF, false, value, KTF.MinimizeButton:GetName())
 								end
-								db.keyBindMinimize = value
+								profile.keyBindMinimize = value
 							end,
 							order = 4.6,
 						},
@@ -815,7 +822,7 @@ local options = {
 							type = "toggle",
 							width = "double",
 							set = function()
-								db.qiBgrBorder = not db.qiBgrBorder
+								profile.qiBgrBorder = not profile.qiBgrBorder
 								KT:SetBackground()
 								KT:MoveButtons()
 							end,
@@ -828,7 +835,7 @@ local options = {
 							max = 10,
 							step = 1,
 							set = function(_, value)
-								db.qiXOffset = value
+								profile.qiXOffset = value
 								KT:MoveButtons()
 							end,
 							order = 5.2,
@@ -869,7 +876,7 @@ local options = {
 							name = "Hide empty tracker",
 							type = "toggle",
 							set = function()
-								db.hideEmptyTracker = not db.hideEmptyTracker
+								profile.hideEmptyTracker = not profile.hideEmptyTracker
 								KT:ToggleEmptyTracker()
 							end,
 							order = 6.11,
@@ -879,7 +886,7 @@ local options = {
 							desc = "Collapses the tracker when entering an instance. Note: Enabled Auto filtering can expand the tracker.",
 							type = "toggle",
 							set = function()
-								db.collapseInInstance = not db.collapseInInstance
+								profile.collapseInInstance = not profile.collapseInInstance
 							end,
 							order = 6.12,
 						},
@@ -888,7 +895,7 @@ local options = {
 							desc = "The tracker will expand when it starts watching something new (Quest, Achievement, etc.).",
 							type = "toggle",
 							set = function()
-								db.expandTrackerAfterTrack = not db.expandTrackerAfterTrack
+								profile.expandTrackerAfterTrack = not profile.expandTrackerAfterTrack
 							end,
 							order = 6.13,
 						},
@@ -903,7 +910,7 @@ local options = {
 							desc = "Show Wowhead URL menu item inside the tracker.",
 							type = "toggle",
 							set = function()
-								db.menuWowheadURL = not db.menuWowheadURL
+								profile.menuWowheadURL = not profile.menuWowheadURL
 							end,
 							order = 6.31,
 						},
@@ -913,13 +920,13 @@ local options = {
 							values = modifiers,
 							get = function()
 								for k, v in pairs(modifiers) do
-									if db.menuWowheadURLModifier == k then
+									if profile.menuWowheadURLModifier == k then
 										return k
 									end
 								end
 							end,
 							set = function(_, value)
-								db.menuWowheadURLModifier = value
+								profile.menuWowheadURLModifier = value
 							end,
 							order = 6.32,
 						},
@@ -935,7 +942,7 @@ local options = {
 							name = "Quest messages",
 							type = "toggle",
 							set = function()
-								db.messageQuest = not db.messageQuest
+								profile.messageQuest = not profile.messageQuest
 							end,
 							order = 7.1,
 						},
@@ -944,11 +951,10 @@ local options = {
 							width = 1.1,
 							type = "toggle",
 							set = function()
-								db.messageAchievement = not db.messageAchievement
+								profile.messageAchievement = not profile.messageAchievement
 							end,
 							order = 7.2,
 						},
-						-- LibSink
 					},
 				},
 				sec8 = {
@@ -956,13 +962,12 @@ local options = {
 					type = "group",
 					inline = true,
 					order = 8,
-					-- TODO Where sounds options are created
 					args = {
 						soundQuest = {
 							name = "Quest sounds",
 							type = "toggle",
 							set = function()
-								db.soundQuest = not db.soundQuest
+								profile.soundQuest = not profile.soundQuest
 							end,
 							order = 8.1,
 						},
@@ -972,12 +977,12 @@ local options = {
 							type = "select",
 							width = 1.2,
 							disabled = function()
-								return not db.soundQuest
+								return not profile.soundQuest
 							end,
 							dialogControl = "LSM30_Sound",
 							values = WidgetLists.sound,
 							set = function(_, value)
-								db.soundQuestComplete = value
+								profile.soundQuestComplete = value
 							end,
 							order = 8.11,
 						},
@@ -985,36 +990,12 @@ local options = {
 							name = "Use Sound Kit",
 							type = "toggle",
 							set = function()
-								db.useSoundKit = not db.useSoundKit
+								profile.useSoundKit = not profile.useSoundKit
 							end,
+							get = function () return profile.useSoundKit end,
 							order = 8.2,
-							width = 1.2,
 						},
-						useSoundKitButton = {
-							name = "Test Sound Kit",
-							type = "execute",							
-							disabled = function() return db.useSoundKit == false end,
-							func = function()
-								 KT.PlaySoundKit(db.selectedSoundKit)
-							end,
-							order = 8.21,
-							width = 1.2,
-						};
-						soundKitSelect = {
-							name = "Random Sound",
-							desc = "Sound kits",
-							type = "select",
-							values =  KT.GetAvailableSoundKitNames(),
-							disabled = function() return db.useSoundKit == false end,
-							get = function()
-								return db.selectedSoundKit
-							end,
-							set = function(_, value)
-								db.selectedSoundKit = value
-							end,
-							order = 8.22,
-							width = 1.2,
-						},
+						soundKitGroup = KT.SoundKitHelper.OptionsDesc
 					},
 				},
 			},
@@ -1034,7 +1015,7 @@ local options = {
 							desc = "Show number of Quests inside the Quests module header.",
 							type = "toggle",
 							set = function()
-								db.questsHeaderTitleAppend = not db.questsHeaderTitleAppend
+								profile.questsHeaderTitleAppend = not profile.questsHeaderTitleAppend
 								KT:SetQuestsHeaderText(true)
 							end,
 							order = 1.1,
@@ -1056,7 +1037,7 @@ local options = {
 							desc = "Show / Hide Quest levels inside the tracker.",
 							type = "toggle",
 							set = function()
-								db.questsShowLevels = not db.questsShowLevels
+								profile.questsShowLevels = not profile.questsShowLevels
 								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 1.3,
@@ -1066,7 +1047,7 @@ local options = {
 							desc = "Show / Hide Quest tags (type, frequency) inside the tracker.",
 							type = "toggle",
 							set = function()
-								db.questsShowTags = not db.questsShowTags
+								profile.questsShowTags = not profile.questsShowTags
 								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 1.4,
@@ -1076,7 +1057,7 @@ local options = {
 							desc = "Show / Hide Quest Zones inside the tracker.",
 							type = "toggle",
 							set = function()
-								db.questsShowZones = not db.questsShowZones
+								profile.questsShowZones = not profile.questsShowZones
 								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 1.5,
@@ -1090,7 +1071,7 @@ local options = {
 							type = "toggle",
 							width = "full",
 							set = function()
-								db.questsObjectiveNumSwitch = not db.questsObjectiveNumSwitch
+								profile.questsObjectiveNumSwitch = not profile.questsObjectiveNumSwitch
 								ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.SETTINGS_CHANGED)
 							end,
 							order = 1.6,
@@ -1109,7 +1090,7 @@ local options = {
 							type = "toggle",
 							width = "normal+half",
 							set = function()
-								db.achievementsHeaderTitleAppend = not db.achievementsHeaderTitleAppend
+								profile.achievementsHeaderTitleAppend = not profile.achievementsHeaderTitleAppend
 								KT:SetAchievementsHeaderText(true)
 							end,
 							order = 2.1,
@@ -1127,7 +1108,7 @@ local options = {
 							desc = "Show Quest / Achievement tooltips.",
 							type = "toggle",
 							set = function()
-								db.tooltipShow = not db.tooltipShow
+								profile.tooltipShow = not profile.tooltipShow
 							end,
 							order = 3.1,
 						},
@@ -1136,10 +1117,10 @@ local options = {
 							desc = "Show Quest Rewards inside tooltips - Artifact Power, Order Resources, Money, Equipment etc.",
 							type = "toggle",
 							disabled = function()
-								return not db.tooltipShow
+								return not profile.tooltipShow
 							end,
 							set = function()
-								db.tooltipShowRewards = not db.tooltipShowRewards
+								profile.tooltipShowRewards = not profile.tooltipShowRewards
 							end,
 							order = 3.2,
 						},
@@ -1148,10 +1129,10 @@ local options = {
 							desc = "Show Quest / Achievement ID inside tooltips.",
 							type = "toggle",
 							disabled = function()
-								return not db.tooltipShow
+								return not profile.tooltipShow
 							end,
 							set = function()
-								db.tooltipShowID = not db.tooltipShowID
+								profile.tooltipShowID = not profile.tooltipShowID
 							end,
 							order = 3.3,
 						},
@@ -1172,7 +1153,7 @@ local options = {
 								return not KT.AddonPetTracker.isAvailable
 							end,
 							set = function()
-								db.pettrackerHeaderTitleAppend = not db.pettrackerHeaderTitleAppend
+								profile.pettrackerHeaderTitleAppend = not profile.pettrackerHeaderTitleAppend
 								KT.AddonPetTracker:SetPetsHeaderText(true)
 							end,
 							order = 4.1,
@@ -1222,7 +1203,7 @@ local options = {
 								return not C_AddOns.IsAddOnLoaded("Questie")
 							end,
 							set = function()
-								db.addonQuestie = not db.addonQuestie
+								profile.addonQuestie = not profile.addonQuestie
 								ReloadUI()
 							end,
 							order = 1.11,
@@ -1246,9 +1227,9 @@ local options = {
 								return not C_AddOns.IsAddOnLoaded("PetTracker")
 							end,
 							set = function()
-								db.addonPetTracker = not db.addonPetTracker
+								profile.addonPetTracker = not profile.addonPetTracker
 								if PetTracker.sets then
-									PetTracker.sets.zoneTracker = db.addonPetTracker
+									PetTracker.sets.zoneTracker = profile.addonPetTracker
 								end
 								ReloadUI()
 							end,
@@ -1332,9 +1313,9 @@ end)
 
 function OverlayFrameUpdate()
 	if overlay then
-		overlay:SetSize(280, db.maxHeight)
+		overlay:SetSize(280, profile.maxHeight)
 		overlay:ClearAllPoints()
-		overlay:SetPoint(db.anchorPoint, 0, 0)
+		overlay:SetPoint(profile.anchorPoint, 0, 0)
 	end
 end
 
@@ -1346,7 +1327,7 @@ function OverlayFrameHide()
 end
 
 function GetModulesOptionsTable()
-	local numModules = #db.modulesOrder
+	local numModules = #profile.modulesOrder
 	local text
 	local defaultModule, defaultText
 	local args = {
@@ -1373,7 +1354,7 @@ function GetModulesOptionsTable()
 		}
 	end
 
-	for i, module in ipairs(db.modulesOrder) do
+	for i, module in ipairs(profile.modulesOrder) do
 		text = _G[module].Header.Text:GetText()
 		if module == "SCENARIO_CONTENT_TRACKER_MODULE" then
 			text = text.." *"
@@ -1434,8 +1415,8 @@ function MoveModule(idx, direction)
 	modules.sec1.args["pos"..idx.."up"].desc = tmpText
 	modules.sec1.args["pos"..idx.."down"].desc = tmpText
 
-	local module = tremove(db.modulesOrder, idx)
-	tinsert(db.modulesOrder, tmpIdx, module)
+	local module = tremove(profile.modulesOrder, idx)
+	tinsert(profile.modulesOrder, tmpIdx, module)
 
 	module = tremove(OTF.MODULES_UI_ORDER, idx)
 	tinsert(OTF.MODULES_UI_ORDER, tmpIdx, module)
@@ -1460,7 +1441,7 @@ end
 local function Init()
 	KT.db = LibStub("AceDB-3.0"):New(strsub(addonName, 2).."DB", defaults, true)
 	KT.options = options
-	db = KT.db.profile
+	profile = KT.db.profile
 	dbChar = KT.db.char
 end
 
@@ -1469,8 +1450,8 @@ local function Setup()
 
 	general.sec7.args.messageOutput = KT:GetSinkAce3OptionsDataTable()
 	general.sec7.args.messageOutput.inline = true
-	general.sec7.args.messageOutput.disabled = function() return not (db.messageQuest or db.messageAchievement) end
-	KT:SetSinkStorage(db)
+	general.sec7.args.messageOutput.disabled = function() return not (profile.messageQuest or profile.messageAchievement) end
+	KT:SetSinkStorage(profile)
 
 	options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(KT.db)
 	options.args.profiles.confirm = true
@@ -1506,8 +1487,8 @@ local function Setup()
 				for i = 1, #trackedAchievements do
 					RemoveTrackedAchievement(trackedAchievements[i])
 				end
-				for i = 1, #db.filterAuto do
-					db.filterAuto[i] = nil
+				for i = 1, #profile.filterAuto do
+					profile.filterAuto[i] = nil
 				end
 				if WOW_PROJECT_ID >= WOW_PROJECT_MISTS_CLASSIC then
 					if KT.AddonPetTracker.isAvailable then
@@ -1552,15 +1533,15 @@ local function Setup()
 	-- Resets and hides some options
 	if WOW_PROJECT_ID < WOW_PROJECT_MISTS_CLASSIC then
 		content.sec4 = nil
-		db.pettrackerHeaderTitleAppend = false
+		profile.pettrackerHeaderTitleAppend = false
 		addons.sec1.args.addonPetTracker = nil
 		addons.sec1.args.addonPetTrackerDesc = nil
 	end
 	if WOW_PROJECT_ID < WOW_PROJECT_WRATH_CLASSIC then
 		general.sec7.args.messageAchievement = nil
-		db.messageAchievement = false
+		profile.messageAchievement = false
 		content.sec2 = nil
-		db.achievementsHeaderTitleAppend = false
+		profile.achievementsHeaderTitleAppend = false
 	end
 end
 
