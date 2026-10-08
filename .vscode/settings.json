@@ -172,7 +172,8 @@
         "QuestMapFrame_OpenToQuestDetails",
         "ScenarioObjectiveTracker",
         "AchievementObjectiveTracker",
-        "QuestObjectiveTracker"
+        "QuestObjectiveTracker",
+        "SOUND"
     ],
     "Lua.type.weakUnionCheck": true
 }

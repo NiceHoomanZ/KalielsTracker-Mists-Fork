@@ -957,7 +957,7 @@ local options = {
 						},
 					},
 				},
-				sec8 = {
+				notificationSoundSection = {
 					name = "Notification sounds",
 					type = "group",
 					inline = true,
@@ -994,8 +994,7 @@ local options = {
 							end,
 							get = function () return profile.useSoundKit end,
 							order = 8.2,
-						},
-						soundKitGroup = KT.SoundKitHelper.OptionsDesc
+						}
 					},
 				},
 			},
@@ -1445,7 +1444,12 @@ local function Init()
 	dbChar = KT.db.char
 end
 
-local function Setup()
+local function SetupOptionsMenu()
+	KT.Utils.Log("Setup options menu")
+
+	-- TODO Inject first button as well
+	general.notificationSoundSection.args.SoundKitSection = KT.SoundKits.GetOptionsDesc(profile)
+
 	general.sec2.args.classBorder.name = general.sec2.args.classBorder.name:format(KT.RgbToHex(KT.classColor))
 
 	general.sec7.args.messageOutput = KT:GetSinkAce3OptionsDataTable()
@@ -1557,7 +1561,7 @@ end
 
 function M:OnEnable()
 	KT.Utils.Log("|cff00ff00Enable|r - "..self:GetName())
-	Setup()
+	SetupOptionsMenu()
 
 	KT:RegEvent("PLAYER_ENTERING_WORLD", function(eventID)
 		SetupModules()

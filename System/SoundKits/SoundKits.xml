@@ -1,0 +1,5 @@
+<Root>
+    <Script file="SoundKitHelpers.lua"/>
+    <Script file="SoundKitData.lua"/>
+    <Script file="OptionsDesc.lua"/>
+</Root>

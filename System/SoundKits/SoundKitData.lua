@@ -1,31 +1,24 @@
--- TODO Move the source csv to a folder external to the addon
--- TODO Allow to select many sound kits
--- TODO Fix bottom of settings not being displayed fully
-
 local _, addon = ...
 ---@class KT
 local KT = addon
 
----@class SoundKitHelper
-local SoundKitHelper = {}
-KT.SoundKitHelper = SoundKitHelper;
-
----@enum SoundKit.Type
+---@enum SoundKits.Type
 local TYPE = {
     M = 1,
     F = 2
 }
 
----@class SoundKit
+---@class SoundKits.SoundKit
 ---@field Name string
 ---@field SoundKitId integer
 ---@field WOW_PROJECT_CONST_NAME string
 ---@field WOW_PROJECT_ID integer
 ---@field Race string
----@field Type SoundKit.Type
+---@field Type SoundKits.Type
 
----@type SoundKit[]
-local allSoundKits = {
+---@private
+---@type SoundKits.SoundKit[]
+KT.SoundKits.AllSoundKits = {
     { Name = "Dwarf Female", SoundKitId = 6104, WOW_PROJECT_CONST_NAME = "WOW_PROJECT_CLASSIC", WOW_PROJECT_ID = 2, Race = "Dwarf", Type = TYPE.F },
     { Name = "Dwarf Male", SoundKitId = 6113, WOW_PROJECT_CONST_NAME = "WOW_PROJECT_CLASSIC", WOW_PROJECT_ID = 2, Race = "Dwarf", Type = TYPE.M },
     { Name = "Gnome Female", SoundKitId = 6122, WOW_PROJECT_CONST_NAME = "WOW_PROJECT_CLASSIC", WOW_PROJECT_ID = 2, Race = "Gnome", Type = TYPE.F },
@@ -54,102 +47,4 @@ local allSoundKits = {
     { Name = "Worgen Female", SoundKitId = 19378, WOW_PROJECT_CONST_NAME = "WOW_PROJECT_CATACLYSM_CLASSIC", WOW_PROJECT_ID = 14, Race = "Worgen", Type = TYPE.F },
     { Name = "Pandaren Male", SoundKitId = 28927, WOW_PROJECT_CONST_NAME = "WOW_PROJECT_MISTS_CLASSIC", WOW_PROJECT_ID = 15, Race = "Pandaren", Type = TYPE.M },
     { Name = "Pandaren Female", SoundKitId = 29793, WOW_PROJECT_CONST_NAME = "WOW_PROJECT_MISTS_CLASSIC", WOW_PROJECT_ID = 15, Race = "Pandaren", Type = TYPE.F },
-}
-
----@type SoundKit[]?
-local availableSoundKits = nil
-
----@private
----@return SoundKit[]
-function SoundKitHelper.GetAvailableSoundKits()
-    if availableSoundKits ~= nil then return availableSoundKits end
-
-    availableSoundKits = {}
-    
-    for _, soundKit in ipairs(allSoundKits) do
-            if WOW_PROJECT_ID >= soundKit.WOW_PROJECT_ID then
-                table.insert(availableSoundKits, soundKit)
-            end
-    end
-
-    return availableSoundKits
-end
-
-function SoundKitHelper.GetAvailableSoundKitNames()
-    local availableSoundKitNames = {}
-
-    for index, soundKit in ipairs(SoundKitHelper.GetAvailableSoundKits()) do
-        availableSoundKitNames[index] = soundKit.Name
-    end
-
-    return availableSoundKitNames
-end
-
----Either play a random sound among all or among the list of the specified sound kit.
----@param useRandom boolean
----@param index integer?
-function SoundKitHelper.PlaySoundKit(useRandom, index)
-    if useRandom then
-        SoundKitHelper.PlayRandomSK()
-        return
-    end
-
-    SoundKitHelper.PlaySKByIndex(index)
-end
-
----@private
----@param index integer
-function SoundKitHelper.PlaySKByIndex(index)
-    local sk = SoundKitHelper.GetAvailableSoundKits()[index]
-    PlaySound(sk.SoundKitId, "SFX")
-end
-
----@private
-function SoundKitHelper.PlayRandomSK()
-    local randIndex = math.random(#SoundKitHelper.GetAvailableSoundKits())
-    local soundKit = SoundKitHelper.GetAvailableSoundKits()[randIndex]
-    PlaySound(soundKit.SoundKitId, "SFX")
-end
-
-SoundKitHelper.OptionsDesc = {
-    name = "Sound kit",
-    type = "group",
-    disabled = function () return KT.db.profile.useSoundKit == false end,
-    hidden = function () return KT.db.profile.useSoundKit == false end,
-    args = {
-        randomizeSoundKit = {
-            name = "Use random sound",
-            type = "toggle",
-            set = function()
-                KT.db.profile.useRandomSoundKit = not KT.db.profile.useRandomSoundKit
-            end,
-            get = function () return KT.db.profile.useRandomSoundKit end,
-            order = 1,
-        },
-        soundKitSelect = {
-            name = "Random Sound",
-            desc = "Sound kits",
-            type = "select",
-            values = KT.SoundKitHelper.GetAvailableSoundKitNames(),
-            get = function()
-                return KT.db.profile.selectedSoundKit
-            end,
-            set = function(_, value)
-                KT.db.profile.selectedSoundKit = value
-            end,
-            order = 2,
-            disabled = function()
-                return KT.db.profile.useRandomSoundKit
-            end
-        },
-        useSoundKitButton = {
-            name = "Listen",
-            type = "execute",
-            func = function()
-                KT.SoundKitHelper.PlaySoundKit(KT.db.profile.useRandomSoundKit, KT.db.profile.selectedSoundKit)
-            end,
-            width = "half",
-            order = 3
-        },
-    }
 }
