@@ -9,8 +9,8 @@ local addonName, addon = ...
 local KT = addon
 
 ---@class Options
-local M = KT:NewModule("Options")
-KT.Options = M
+local OptionModule = KT:NewModule("Options")
+KT.Options = OptionModule
 
 local ACD = LibStub("MSA-AceConfigDialog-3.0")
 local ACR = LibStub("AceConfigRegistry-3.0")
@@ -985,15 +985,6 @@ local options = {
 								profile.soundQuestComplete = value
 							end,
 							order = 8.11,
-						},
-						soundKitToggle = {
-							name = "Use Sound Kit",
-							type = "toggle",
-							set = function()
-								profile.useSoundKit = not profile.useSoundKit
-							end,
-							get = function () return profile.useSoundKit end,
-							order = 8.2,
 						}
 					},
 				},
@@ -1447,8 +1438,7 @@ end
 local function SetupOptionsMenu()
 	KT.Utils.Log("Setup options menu")
 
-	-- TODO Inject first button as well
-	general.notificationSoundSection.args.SoundKitSection = KT.SoundKits.GetOptionsDesc(profile)
+	KT.SoundKits.AppendOptions(general.notificationSoundSection, profile)
 
 	general.sec2.args.classBorder.name = general.sec2.args.classBorder.name:format(KT.RgbToHex(KT.classColor))
 
@@ -1553,13 +1543,13 @@ local function SetupModules()
 	modules.sec1.args = GetModulesOptionsTable()
 end
 
-function M:OnInitialize()
+function OptionModule:OnInitialize()
 	KT.Utils.Log("|cffffff00Init|r - "..self:GetName())
 	Init()
     self.isAvailable = true
 end
 
-function M:OnEnable()
+function OptionModule:OnEnable()
 	KT.Utils.Log("|cff00ff00Enable|r - "..self:GetName())
 	SetupOptionsMenu()
 

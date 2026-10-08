@@ -1,7 +1,6 @@
 -- TODO Move the source csv to a folder external to the addon
 -- TODO Allow to select many sound kits
 -- TODO Fix bottom of settings not being displayed fully
--- TODO Split file and make a folder
 
 local _, addon = ...
 ---@class KT

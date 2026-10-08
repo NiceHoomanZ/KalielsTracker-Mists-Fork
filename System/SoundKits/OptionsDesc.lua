@@ -4,8 +4,18 @@ local KT = addon
 
 ---@param profile KT.Profile
 ---@return table table Description for this option section
-function KT.SoundKits.GetOptionsDesc(profile)
-    return {
+function KT.SoundKits.AppendOptions(section, profile)
+    section.args.soundKitToggle = {
+        name = "Use Sound Kit",
+        type = "toggle",
+        set = function()
+            profile.useSoundKit = not profile.useSoundKit
+        end,
+        get = function () return profile.useSoundKit end,
+        order = 8.2,
+    }
+    
+    section.args.soundKitSection = {
         name = "Sound kit",
         type = "group",
         disabled = function () return profile.useSoundKit == false end,
