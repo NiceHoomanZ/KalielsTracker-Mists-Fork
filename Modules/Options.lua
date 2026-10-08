@@ -958,7 +958,6 @@ local options = {
 							name = "Complete Sound",
 							desc = "Addon sounds are prefixed \"KT - \".",
 							type = "select",
-							width = 1.2,
 							disabled = function()
 								return not profile.soundQuest
 							end,

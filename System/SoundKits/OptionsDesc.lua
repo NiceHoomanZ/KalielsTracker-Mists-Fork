@@ -8,16 +8,18 @@ function KT.SoundKits.AppendOptions(section, profile)
     section.args.soundKitToggle = {
         name = "Use Sound Kit",
         type = "toggle",
+        order = 8.2,
+        width = "normal",
+        get = function () return profile.useSoundKit end,
         set = function()
             profile.useSoundKit = not profile.useSoundKit
         end,
-        get = function () return profile.useSoundKit end,
-        order = 8.2,
     }
 
     section.args.soundKitSection = {
         name = "Sound kit",
         type = "group",
+        order = 8.3,
         disabled = function () return profile.useSoundKit == false end,
         hidden = function () return profile.useSoundKit == false end,
         args = {
@@ -27,7 +29,7 @@ function KT.SoundKits.AppendOptions(section, profile)
                 func = function()
                     KT.SoundKits.PlaySoundKits(profile.useRandomSoundKit, profile.selectedSoundKits)
                 end,
-                width = "half",
+                width = "full",
                 order = 1
             },
             allToggle = {
