@@ -25,7 +25,7 @@ local strsplit = string.split
 local strsub = string.sub
 
 ---@class KT.Profile
----@field selectedSoundKit integer
+---@field selectedSoundKits integer[]
 ---@field useRandomSoundKit boolean
 local profile
 local anchors = { "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT" }
@@ -106,7 +106,7 @@ local defaults = {
 		soundQuestComplete = "KT - Default",
 		useSoundKit = false,
 		useRandomSoundKit = true,
-		selectedSoundKit = 0,
+		selectedSoundKits = {0},
 
 		questsHeaderTitleAppend = true,
 		questsShowLevels = true,
@@ -839,25 +839,7 @@ local options = {
 								KT:MoveButtons()
 							end,
 							order = 5.2,
-						},
-						--[[addonMasqueLabel = {
-							name = " Skin options - for Quest item buttons or Active button",
-							type = "description",
-							width = "double",
-							fontSize = "medium",
-							order = 5.3,
-						},
-						addonMasqueOptions = {
-							name = "Masque",
-							type = "execute",
-							disabled = function()
-								return (not C_AddOns.IsAddOnLoaded("Masque") or not db.addonMasque or not KT.AddonOthers:IsEnabled())
-							end,
-							func = function()
-								SlashCmdList["MASQUE"]()
-							end,
-							order = 5.31,
-						},]]
+						}
 					},
 				},
 				sec6 = {

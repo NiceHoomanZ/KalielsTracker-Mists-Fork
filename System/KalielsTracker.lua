@@ -644,7 +644,7 @@ local function SetHooks()
 		if db.useSoundKit == false then
 			KT:PlaySound(db.soundQuestComplete)
 		else
-			KT.SoundKits.PlaySoundKit(db.useRandomSoundKit, db.selectedSoundKit)
+			KT.SoundKits.PlaySoundKit(db.useRandomSoundKit, db.selectedSoundKits)
 		end
 	end
 
