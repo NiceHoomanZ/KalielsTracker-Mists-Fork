@@ -25,8 +25,9 @@ local strsplit = string.split
 local strsub = string.sub
 
 ---@class KT.Profile
----@field selectedSoundKits integer[]
+---@field useSoundKit boolean
 ---@field useRandomSoundKit boolean
+---@field selectedSoundKits { [integer]: integer }
 local profile
 local anchors = { "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT" }
 local strata = { "LOW", "MEDIUM", "HIGH" }
@@ -106,7 +107,7 @@ local defaults = {
 		soundQuestComplete = "KT - Default",
 		useSoundKit = false,
 		useRandomSoundKit = true,
-		selectedSoundKits = {0},
+		selectedSoundKits = {},
 
 		questsHeaderTitleAppend = true,
 		questsShowLevels = true,

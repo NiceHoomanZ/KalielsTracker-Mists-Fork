@@ -1,5 +1,4 @@
 -- TODO Move the source csv to a folder external to the addon
--- TODO Allow to select many sound kits
 -- TODO Fix bottom of settings not being displayed fully
 
 local _, addon = ...
@@ -42,26 +41,39 @@ end
 
 ---Either play a random sound among all or among the list of the specified sound kit.
 ---@param useRandom boolean
----@param index integer?
-function SoundKits.PlaySoundKit(useRandom, index)
+---@param indexDict { [integer]: integer }?
+function SoundKits.PlaySoundKits(useRandom, indexDict)
     if useRandom then
         SoundKits:PlayRandomSK()
         return
     end
 
-    SoundKits.PlaySKByIndex(index)
+    SoundKits.PlayRandomSKAmongIndexes(indexDict)
 end
 
 ---@private
----@param index integer
-function SoundKits.PlaySKByIndex(index)
-    local sk = SoundKits:GetAvailableSoundKits()[index]
-    PlaySound(sk.SoundKitId, "SFX")
+---@param indexDict { [integer]: integer }
+function SoundKits.PlayRandomSKAmongIndexes(indexDict)
+    if next(indexDict) == nil then
+        KT.Utils.LogError("No sound kit to play !")
+        return
+    end
+
+    local indexArray = {}
+    for _, value in pairs(indexDict) do
+        table.insert(indexArray, value)
+    end
+
+    local randIndex = random(#indexArray)
+    local skRandIndex = indexArray[randIndex]
+
+    local soundKit = SoundKits:GetAvailableSoundKits()[skRandIndex]
+    PlaySound(soundKit.Id, "SFX")
 end
 
 ---@private
 function SoundKits.PlayRandomSK()
     local randIndex = math.random(#SoundKits:GetAvailableSoundKits())
     local soundKit = SoundKits:GetAvailableSoundKits()[randIndex]
-    PlaySound(soundKit.SoundKitId, "SFX")
+    PlaySound(soundKit.Id, "SFX")
 end

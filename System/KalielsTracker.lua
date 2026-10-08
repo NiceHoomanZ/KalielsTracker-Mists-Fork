@@ -41,7 +41,7 @@ local freeButtons = {}
 local msgPatterns = {}
 local combatLockdown = false
 ---@type KT.Profile
-local db
+local profile
 local dbChar
 
 -- Main frame
@@ -92,21 +92,21 @@ local function ObjectiveTracker_Toggle()
 end
 
 local function SetHeaders(type)
-	local bgrColor = db.headerBgrColorShare and KT.borderColor or db.headerBgrColor
-	local txtColor = db.headerTxtColorShare and KT.borderColor or db.headerTxtColor
+	local bgrColor = profile.headerBgrColorShare and KT.borderColor or profile.headerBgrColor
+	local txtColor = profile.headerTxtColorShare and KT.borderColor or profile.headerTxtColor
 
 	if not type or type == "background" then
 		for _, header in ipairs(KT.headers) do
-			if db.headerBgr == 1 then
+			if profile.headerBgr == 1 then
 				header.Background:Hide()
-			elseif db.headerBgr == 2 then
+			elseif profile.headerBgr == 2 then
 				header.Background:SetAtlas("Objective-Header")
 				header.Background:SetVertexColor(1, 1, 1)
 				header.Background:ClearAllPoints()
 				header.Background:SetPoint("TOPLEFT", -29, 14)
 				header.Background:Show()
-			elseif db.headerBgr >= 3 then
-				header.Background:SetTexture(KT.MEDIA_PATH.."UI-KT-HeaderBackground-"..(db.headerBgr - 2))
+			elseif profile.headerBgr >= 3 then
+				header.Background:SetTexture(KT.MEDIA_PATH.."UI-KT-HeaderBackground-"..(profile.headerBgr - 2))
 				header.Background:SetVertexColor(bgrColor.r, bgrColor.g, bgrColor.b)
 				header.Background:SetPoint("TOPLEFT", -20, 0)
 				header.Background:SetPoint("BOTTOMRIGHT", 17, -7)
@@ -115,19 +115,19 @@ local function SetHeaders(type)
 		end
 	end
 	if not type or type == "text" then
-		OTFHeader.Title:SetFont(KT.font, db.fontSize, db.fontFlag)
+		OTFHeader.Title:SetFont(KT.font, profile.fontSize, profile.fontFlag)
 		OTFHeader.Title:SetTextColor(txtColor.r, txtColor.g, txtColor.b)
-		OTFHeader.Title:SetShadowColor(0, 0, 0, db.fontShadow)
+		OTFHeader.Title:SetShadowColor(0, 0, 0, profile.fontShadow)
 
 		for _, header in ipairs(KT.headers) do
 			if type == "text" then
-				header.Text:SetFont(KT.font, db.fontSize+1, db.fontFlag)
-				if db.headerBgr == 2 then
+				header.Text:SetFont(KT.font, profile.fontSize+1, profile.fontFlag)
+				if profile.headerBgr == 2 then
 					header.Text:SetTextColor(1, 0.82, 0)
 				else
 					header.Text:SetTextColor(txtColor.r, txtColor.g, txtColor.b)
 				end
-				header.Text:SetShadowColor(0, 0, 0, db.fontShadow)
+				header.Text:SetShadowColor(0, 0, 0, profile.fontShadow)
 				header.Text:SetPoint("LEFT", 4, 0.5)
 				header.animateReason = 0
 			end
@@ -162,10 +162,10 @@ end
 local function SetScrollbarPosition()
 	local xOffset = -5
 	local yOffset = -5
-	local scrollRange = OTF.height - db.maxHeight
+	local scrollRange = OTF.height - profile.maxHeight
 	if scrollRange > 0 then
 		local barSpace = 60  -- 50 + 2×5
-		local usableHeight = db.maxHeight - barSpace
+		local usableHeight = profile.maxHeight - barSpace
 		local scrollRatio = KTF.Scroll.value / scrollRange
 		yOffset = -1 * round(5 + (usableHeight * scrollRatio))
 	end
@@ -188,11 +188,11 @@ end
 -- Init ----------------------------------------------------------------------------------------------------------------
 
 local function Init()
-	if db.keyBindMinimize ~= "" then
-		SetOverrideBindingClick(KTF, false, db.keyBindMinimize, KTF.MinimizeButton:GetName())
+	if profile.keyBindMinimize ~= "" then
+		SetOverrideBindingClick(KTF, false, profile.keyBindMinimize, KTF.MinimizeButton:GetName())
 	end
 
-	for i, module in ipairs(db.modulesOrder) do
+	for i, module in ipairs(profile.modulesOrder) do
 		OTF.MODULES_UI_ORDER[i] = _G[module]
 		KT:SaveHeader(OTF.MODULES_UI_ORDER[i])
 	end
@@ -226,7 +226,7 @@ end
 local function SetFrames()
 	-- Main frame
 	KTF:SetWidth(trackerWidth)
-	KTF:SetFrameStrata(db.frameStrata)
+	KTF:SetFrameStrata(profile.frameStrata)
 	KTF:SetFrameLevel(KTF:GetFrameLevel() + 25)
 
 	KTF:SetScript("OnEvent", function(_, event, ...)
@@ -234,7 +234,7 @@ local function SetFrames()
 		if event == "PLAYER_ENTERING_WORLD" and not KT.stopUpdate then
 			KT.inWorld = true
 			KT.inInstance = IsInInstance()
-			if db.collapseInInstance and KT.inInstance and not dbChar.collapsed then
+			if profile.collapseInInstance and KT.inInstance and not dbChar.collapsed then
 				ObjectiveTracker_Toggle()
 			end
 		elseif event == "PLAYER_LEAVING_WORLD" then
@@ -337,7 +337,7 @@ local function SetFrames()
 	button:SetScript("OnEnter", function(self)
 		self:GetNormalTexture():SetVertexColor(1, 1, 1)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		local title = KT.TITLE..((db.keyBindMinimize ~= "") and NORMAL_FONT_COLOR_CODE.." ("..db.keyBindMinimize..")|r" or "")
+		local title = KT.TITLE..((profile.keyBindMinimize ~= "") and NORMAL_FONT_COLOR_CODE.." ("..profile.keyBindMinimize..")|r" or "")
 		GameTooltip:AddLine(title, 1, 1, 1)
 		GameTooltip:AddLine("Alt+Click - addon Options", 0.5, 0.5, 0.5)
 		GameTooltip:Show()
@@ -357,17 +357,17 @@ local function SetFrames()
 	Scroll.step = 20
 	Scroll.value = 0
 	Scroll:SetScript("OnMouseWheel", function(self, delta)
-		if not dbChar.collapsed and OTF.height > db.maxHeight then
+		if not dbChar.collapsed and OTF.height > profile.maxHeight then
 			if delta < 0 then
-				self.value = (self.value+self.step < OTF.height-db.maxHeight) and self.value + self.step or OTF.height - db.maxHeight
+				self.value = (self.value+self.step < OTF.height-profile.maxHeight) and self.value + self.step or OTF.height - profile.maxHeight
 			else
 				self.value = (self.value-self.step > 0) and self.value - self.step or 0
 			end
 			self:SetVerticalScroll(self.value)
-			if db.frameScrollbar then
+			if profile.frameScrollbar then
 				SetScrollbarPosition()
 			end
-			if self.value > 0 and self.value < OTF.height-db.maxHeight then
+			if self.value > 0 and self.value < OTF.height-profile.maxHeight then
 				MSA_CloseDropDownMenus()
 			end
 		end
@@ -415,7 +415,7 @@ local function SetFrames()
 	local Buttons = CreateFrame("Frame", addonName.."_QuestButtonBar", UIParent, "BackdropTemplate")
 	Buttons:SetSize(40, 40)
 	Buttons:SetPoint("TOPLEFT", 0, 0)
-	Buttons:SetFrameStrata(db.frameStrata)
+	Buttons:SetFrameStrata(profile.frameStrata)
 	Buttons:SetFrameLevel(KTF:GetFrameLevel() - 1)
 	Buttons:SetAlpha(0)
 	Buttons.num = 0
@@ -502,9 +502,9 @@ local function SetHooks()
 		if dbChar.collapsed then
 			local _, numQuests = GetNumQuestLogEntries()
 			local title = ""
-			if db.headerCollapsedTxt == 2 then
+			if profile.headerCollapsedTxt == 2 then
 				title = "|T"..KT.MEDIA_PATH.."KT_logo:22:22:0:1|t"..("%d/%d"):format(numQuests, MAX_QUESTLOG_QUESTS)
-			elseif db.headerCollapsedTxt == 3 then
+			elseif profile.headerCollapsedTxt == 3 then
 				title = "|T"..KT.MEDIA_PATH.."KT_logo:22:22:0:1|t"..("%d/%d Quests"):format(numQuests, MAX_QUESTLOG_QUESTS)
 			end
 			OTFHeader.Title:SetText(title)
@@ -537,7 +537,7 @@ local function SetHooks()
 			if tonumber(numHave) > 0 and tonumber(numHave) < tonumber(numNeed) then
 				progress = "|cffc8c800" .. progress .. "|r"
 			end
-			if not db.questsObjectiveNumSwitch then
+			if not profile.questsObjectiveNumSwitch then
 				text = leftText .. colon .. progress .. rightText
 			else
 				text = progress
@@ -577,16 +577,16 @@ local function SetHooks()
 				line.dashStyle = dashStyle;
 			end
 			if line.Dash.KTskinID ~= KT.skinID then
-				line.Dash:SetFont(KT.font, db.fontSize, db.fontFlag)
-				line.Dash:SetShadowColor(0, 0, 0, db.fontShadow)
+				line.Dash:SetFont(KT.font, profile.fontSize, profile.fontFlag)
+				line.Dash:SetShadowColor(0, 0, 0, profile.fontShadow)
 				line.Dash.KTskinID = KT.skinID
 			end
 		end
 		-- check
 		if line.Check and line.Check.KTskinID ~= KT.skinID then
-			line.Check:SetSize(db.fontSize-2.5, db.fontSize-2.5)
+			line.Check:SetSize(profile.fontSize-2.5, profile.fontSize-2.5)
 			line.Check:ClearAllPoints()
-			line.Check:SetPoint("TOPLEFT", -db.fontSize*0.2+(db.fontFlag == "" and 0 or 1), -2)
+			line.Check:SetPoint("TOPLEFT", -profile.fontSize*0.2+(profile.fontFlag == "" and 0 or 1), -2)
 			line.Check.KTskinID = KT.skinID
 		end
 		-- set the text
@@ -618,10 +618,10 @@ local function SetHooks()
 			if strfind(objectiveKey, "QuestComplete") then
 				local state = KT.QuestsCache_GetProperty(block.id, "state")
 				if state and state ~= "complete" then
-					if db.messageQuest then
+					if profile.messageQuest then
 						KT:SetMessage(block.title, 0, 1, 0, ERR_QUEST_COMPLETE_S, "Interface\\GossipFrame\\ActiveQuestIcon", -2, 0)
 					end
-					if db.soundQuest then
+					if profile.soundQuest then
 						KT.PlayQuestCompletedSound()
 					end
 					KT.QuestsCache_SetProperty(block.id, "state", "complete")
@@ -629,7 +629,7 @@ local function SetHooks()
 			elseif strfind(objectiveKey, "QuestFailed") then
 				local state = KT.QuestsCache_GetProperty(block.id, "state")
 				if state and state ~= "failed" then
-					if db.messageQuest then
+					if profile.messageQuest then
 						KT:SetMessage(block.title, 1, 0, 0, ERR_QUEST_FAILED_S, "Interface\\GossipFrame\\AvailableQuestIcon", -2, 0)
 					end
 					KT.QuestsCache_SetProperty(block.id, "state", "failed")
@@ -641,18 +641,18 @@ local function SetHooks()
 	end
 
 	function KT.PlayQuestCompletedSound()
-		if db.useSoundKit == false then
-			KT:PlaySound(db.soundQuestComplete)
+		if profile.useSoundKit == false then
+			KT:PlaySound(profile.soundQuestComplete)
 		else
-			KT.SoundKits.PlaySoundKit(db.useRandomSoundKit, db.selectedSoundKits)
+			KT.SoundKits.PlaySoundKits(profile.useRandomSoundKit, profile.selectedSoundKits)
 		end
 	end
 
 	function DEFAULT_OBJECTIVE_TRACKER_MODULE:SetStringText(fontString, text, useFullHeight, colorStyle, useHighlight)  -- RO
 		if fontString.KTskinID ~= KT.skinID then
-			fontString:SetFont(KT.font, db.fontSize, db.fontFlag)
-			fontString:SetShadowColor(0, 0, 0, db.fontShadow)
-			fontString:SetWordWrap(db.textWordWrap)
+			fontString:SetFont(KT.font, profile.fontSize, profile.fontFlag)
+			fontString:SetShadowColor(0, 0, 0, profile.fontShadow)
+			fontString:SetWordWrap(profile.textWordWrap)
 			fontString.KTskinID = KT.skinID
 		end
 		if self == QUEST_TRACKER_MODULE and not useHighlight then
@@ -681,7 +681,7 @@ local function SetHooks()
 		if self == QUEST_TRACKER_MODULE then
 			if block.questCompleted then
 				colorStyle = OBJECTIVE_TRACKER_COLOR["CompleteHighlight"]
-			elseif db.colorDifficulty then
+			elseif profile.colorDifficulty then
 				_, colorStyle = GetQuestDifficultyColor(block.level)
 			end
 		end
@@ -690,7 +690,7 @@ local function SetHooks()
 			block.HeaderText.colorStyle = colorStyle
 		end
 
-		if db.tooltipShow and (self == QUEST_TRACKER_MODULE or self == ACHIEVEMENT_TRACKER_MODULE) then
+		if profile.tooltipShow and (self == QUEST_TRACKER_MODULE or self == ACHIEVEMENT_TRACKER_MODULE) then
 			GameTooltip:SetOwner(block, "ANCHOR_NONE")
 			GameTooltip:ClearAllPoints()
 			if KTF.anchorLeft then
@@ -709,13 +709,13 @@ local function SetHooks()
 				end
 				GameTooltip:AddLine(" ")
 				GameTooltip:AddLine(questDescription, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b, true)
-				if db.tooltipShowRewards then
+				if profile.tooltipShowRewards then
 					KT.GameTooltip_AddQuestRewardsToTooltip(GameTooltip, block.id)
 				end
 			else
 				GameTooltip:SetHyperlink(GetAchievementLink(block.id))
 			end
-			if db.tooltipShowID then
+			if profile.tooltipShowID then
 				GameTooltip:AddLine(" ")
 				GameTooltip:AddDoubleLine(" ", "ID: |cffffffff"..block.id)
 			end
@@ -734,7 +734,7 @@ local function SetHooks()
 		if self == QUEST_TRACKER_MODULE then
 			if block.questCompleted then
 				colorStyle = OBJECTIVE_TRACKER_COLOR["Complete"]
-			elseif db.colorDifficulty then
+			elseif profile.colorDifficulty then
 				colorStyle = GetQuestDifficultyColor(block.level)
 			end
 		end
@@ -743,7 +743,7 @@ local function SetHooks()
 			block.HeaderText.colorStyle = colorStyle
 		end
 
-		if db.tooltipShow then
+		if profile.tooltipShow then
 			GameTooltip:Hide()
 		end
 
@@ -779,7 +779,7 @@ local function SetHooks()
 		local colorStyle
 		if block.questCompleted then
 			colorStyle = OBJECTIVE_TRACKER_COLOR["Complete"]
-		elseif db.colorDifficulty and self == QUEST_TRACKER_MODULE then
+		elseif profile.colorDifficulty and self == QUEST_TRACKER_MODULE then
 			colorStyle = GetQuestDifficultyColor(block.level)
 		end
 		if colorStyle then
@@ -940,11 +940,11 @@ local function SetHooks()
 	local bck_QUEST_TRACKER_MODULE_SetBlockHeader = QUEST_TRACKER_MODULE.SetBlockHeader
 	function QUEST_TRACKER_MODULE:SetBlockHeader(block, text, questLogIndex, isQuestComplete, questID)
 		local _, level, suggestedGroup, _, _, _, frequency, _ = GetQuestLogTitle(questLogIndex)
-		if db.questsShowLevels then
+		if profile.questsShowLevels then
 			text = KT:CreateQuestLevel(level)..text
 		end
 		block.title = text
-		if db.questsShowTags then
+		if profile.questsShowTags then
 			local tagID, _ = GetQuestTagInfo(questID)
 			text = text..KT:CreateQuestTag(tagID, frequency, suggestedGroup)
 		end
@@ -1021,7 +1021,7 @@ local function SetHooks()
 
 			progressBar.Bar.Label:SetPoint("CENTER", 0, 0.5)
 			progressBar.Bar.Label:SetFont(LSM:Fetch("font", "Arial Narrow"), 13, "")
-			progressBar.Bar:SetStatusBarTexture(LSM:Fetch("statusbar", db.progressBar))
+			progressBar.Bar:SetStatusBarTexture(LSM:Fetch("statusbar", profile.progressBar))
 			progressBar.KTskinID = KT.skinID
 			progressBar.isSkinned = true	-- ElvUI hack
 
@@ -1142,7 +1142,7 @@ local function SetHooks()
 
 	local bck_UIErrorsFrame_OnEvent = UIErrorsFrame:GetScript("OnEvent")
 	UIErrorsFrame:SetScript("OnEvent", function(self, event, ...)
-		if db.messageQuest and event == "UI_INFO_MESSAGE" then
+		if profile.messageQuest and event == "UI_INFO_MESSAGE" then
 			local text, _ = ...
 			for _, patt in ipairs(msgPatterns) do
 				if strfind(text, patt) then
@@ -1234,7 +1234,7 @@ local function SetHooks()
 			MSA_CloseDropDownMenus();
 			if ( IsModifiedClick("QUESTWATCHTOGGLE") ) then
 				QuestObjectiveTracker_UntrackQuest(nil, block.id);
-			elseif IsModifiedClick(db.menuWowheadURLModifier) then
+			elseif IsModifiedClick(profile.menuWowheadURLModifier) then
 				KT:Alert_WowheadURL("quest", block.id)
 			else
 				local questLogIndex = GetQuestLogIndexByID(block.id);
@@ -1285,7 +1285,7 @@ local function SetHooks()
 		info.func = QuestObjectiveTracker_UntrackQuest;
 		info.arg1 = block.id;
 		info.checked = false;
-		info.disabled = (db.filterAuto[1]);
+		info.disabled = (profile.filterAuto[1]);
 		MSA_DropDownMenu_AddButton(info, MSA_DROPDOWN_MENU_LEVEL);
 
 		info.text = ABANDON_QUEST;
@@ -1298,7 +1298,7 @@ local function SetHooks()
 
 		info.disabled = false;
 
-		if db.menuWowheadURL then
+		if profile.menuWowheadURL then
 			info.text = "|cff33ff99Wowhead|r URL";
 			info.func = KT.Alert_WowheadURL;
 			info.arg1 = "quest";
@@ -1324,7 +1324,7 @@ local function SetHooks()
 				end
 				if ( IsModifiedClick("QUESTWATCHTOGGLE") ) then
 					AchievementObjectiveTracker_UntrackAchievement(_, block.id);
-				elseif IsModifiedClick(db.menuWowheadURLModifier) then
+				elseif IsModifiedClick(profile.menuWowheadURLModifier) then
 					KT:Alert_WowheadURL("achievement", block.id)
 				elseif ( not AchievementFrame:IsShown() ) then
 					AchievementFrame_ToggleAchievementFrame();
@@ -1364,12 +1364,12 @@ local function SetHooks()
 			info.func = AchievementObjectiveTracker_UntrackAchievement;
 			info.arg1 = block.id;
 			info.checked = false;
-			info.disabled = (db.filterAuto[2]);
+			info.disabled = (profile.filterAuto[2]);
 			MSA_DropDownMenu_AddButton(info, MSA_DROPDOWN_MENU_LEVEL);
 
 			info.disabled = false;
 
-			if db.menuWowheadURL then
+			if profile.menuWowheadURL then
 				info.text = "|cff33ff99Wowhead|r URL";
 				info.func = KT.Alert_WowheadURL;
 				info.arg1 = "achievement";
@@ -1412,22 +1412,22 @@ function KT:SetSize()
 		height = OTF.BlocksFrame.contentsHeight + mod + 10 + paddingBottom
 		OTF.height = height
 
-		if height > db.maxHeight then
-			if KTF.Scroll.value > OTF.height-db.maxHeight then
-				KTF.Scroll.value = OTF.height - db.maxHeight
+		if height > profile.maxHeight then
+			if KTF.Scroll.value > OTF.height-profile.maxHeight then
+				KTF.Scroll.value = OTF.height - profile.maxHeight
 			end
 			KTF.Scroll:SetVerticalScroll(KTF.Scroll.value)
-			if db.frameScrollbar then
+			if profile.frameScrollbar then
 				SetScrollbarPosition()
 				KTF.Bar:Show()
 			end
-			height = db.maxHeight
-		elseif height <= db.maxHeight then
+			height = profile.maxHeight
+		elseif height <= profile.maxHeight then
 			if KTF.Scroll.value > 0 then
 				KTF.Scroll.value = 0
 				KTF.Scroll:SetVerticalScroll(0)
 			end
-			if db.frameScrollbar then
+			if profile.frameScrollbar then
 				KTF.Bar:Hide()
 			end
 		end
@@ -1438,12 +1438,12 @@ function KT:SetSize()
 		self:MoveButtons()
 	else
 		-- width
-		if db.headerCollapsedTxt == 1 then
+		if profile.headerCollapsedTxt == 1 then
 			local width = 35
 			if KTF.FilterButton then
 				width = width + 20
 			end
-			if db.headerOtherButtons then
+			if profile.headerOtherButtons then
 				if KTF.AchievementsButton then
 					width = width + 20
 				end
@@ -1463,7 +1463,7 @@ function KT:SetSize()
             KTF.Scroll.value = 0
         end
 		KTF.Scroll:SetVerticalScroll(0)
-		if db.frameScrollbar then
+		if profile.frameScrollbar then
 			KTF.Bar:Hide()
 		end
 		if height ~= KTF.height then
@@ -1475,9 +1475,9 @@ end
 
 function KT:MoveTracker()
 	KTF:ClearAllPoints()
-	KTF:SetPoint(db.anchorPoint, UIParent, db.anchorPoint, db.xOffset, db.yOffset)
-	KTF.directionUp = (db.anchorPoint == "BOTTOMLEFT" or db.anchorPoint == "BOTTOMRIGHT")
-	KTF.anchorLeft = (db.anchorPoint == "TOPLEFT" or db.anchorPoint == "BOTTOMLEFT")
+	KTF:SetPoint(profile.anchorPoint, UIParent, profile.anchorPoint, profile.xOffset, profile.yOffset)
+	KTF.directionUp = (profile.anchorPoint == "BOTTOMLEFT" or profile.anchorPoint == "BOTTOMRIGHT")
+	KTF.anchorLeft = (profile.anchorPoint == "TOPLEFT" or profile.anchorPoint == "BOTTOMLEFT")
 
 	local options = self.options.args.general.args.sec1.args
 	if KTF.anchorLeft then
@@ -1496,8 +1496,8 @@ function KT:MoveTracker()
 		options.yOffset.max = 0
 	end
 
-	options.maxHeight.max = self.screenHeight - abs(db.yOffset)
-	db.maxHeight = (abs(db.yOffset)+db.maxHeight > self.screenHeight) and options.maxHeight.max or db.maxHeight
+	options.maxHeight.max = self.screenHeight - abs(profile.yOffset)
+	profile.maxHeight = (abs(profile.yOffset)+profile.maxHeight > self.screenHeight) and options.maxHeight.max or profile.maxHeight
 
 	self:MoveButtons()
 end
@@ -1509,52 +1509,52 @@ end
 
 function KT:SetBackground()
 	local backdrop = {
-		bgFile = LSM:Fetch("background", db.bgr),
-		edgeFile = LSM:Fetch("border", db.border),
-		edgeSize = db.borderThickness,
-		insets = { left=db.bgrInset, right=db.bgrInset, top=db.bgrInset, bottom=db.bgrInset }
+		bgFile = LSM:Fetch("background", profile.bgr),
+		edgeFile = LSM:Fetch("border", profile.border),
+		edgeSize = profile.borderThickness,
+		insets = { left=profile.bgrInset, right=profile.bgrInset, top=profile.bgrInset, bottom=profile.bgrInset }
 	}
-	self.borderColor = db.classBorder and self.classColor or db.borderColor
+	self.borderColor = profile.classBorder and self.classColor or profile.borderColor
 
 	KTF:SetBackdrop(backdrop)
-	KTF:SetBackdropColor(db.bgrColor.r, db.bgrColor.g, db.bgrColor.b, db.bgrColor.a)
-	KTF:SetBackdropBorderColor(self.borderColor.r, self.borderColor.g, self.borderColor.b, db.borderAlpha)
+	KTF:SetBackdropColor(profile.bgrColor.r, profile.bgrColor.g, profile.bgrColor.b, profile.bgrColor.a)
+	KTF:SetBackdropBorderColor(self.borderColor.r, self.borderColor.g, self.borderColor.b, profile.borderAlpha)
 
 	SetHeaders("background")
 
-	self.headerBtnColor = db.headerBtnColorShare and self.borderColor or db.headerBtnColor
+	self.headerBtnColor = profile.headerBtnColorShare and self.borderColor or profile.headerBtnColor
 	KTF.MinimizeButton:GetNormalTexture():SetVertexColor(self.headerBtnColor.r, self.headerBtnColor.g, self.headerBtnColor.b)
 	if self.Filters:IsEnabled() then
-		if db.filterAuto[1] or db.filterAuto[2] or db.filterAuto[3] then
+		if profile.filterAuto[1] or profile.filterAuto[2] or profile.filterAuto[3] then
 			KTF.FilterButton:GetNormalTexture():SetVertexColor(0, 1, 0)
 		else
 			KTF.FilterButton:GetNormalTexture():SetVertexColor(self.headerBtnColor.r, self.headerBtnColor.g, self.headerBtnColor.b)
 		end
 	end
-	if db.headerOtherButtons then
+	if profile.headerOtherButtons then
 		KTF.QuestLogButton:GetNormalTexture():SetVertexColor(self.headerBtnColor.r, self.headerBtnColor.g, self.headerBtnColor.b)
 		if WOW_PROJECT_ID >= WOW_PROJECT_WRATH_CLASSIC then
 			KTF.AchievementsButton:GetNormalTexture():SetVertexColor(self.headerBtnColor.r, self.headerBtnColor.g, self.headerBtnColor.b)
 		end
 	end
 
-	if db.qiBgrBorder then
+	if profile.qiBgrBorder then
 		KTF.Buttons:SetBackdrop(backdrop)
-		KTF.Buttons:SetBackdropColor(db.bgrColor.r, db.bgrColor.g, db.bgrColor.b, db.bgrColor.a)
-		KTF.Buttons:SetBackdropBorderColor(self.borderColor.r, self.borderColor.g, self.borderColor.b, db.borderAlpha)
+		KTF.Buttons:SetBackdropColor(profile.bgrColor.r, profile.bgrColor.g, profile.bgrColor.b, profile.bgrColor.a)
+		KTF.Buttons:SetBackdropBorderColor(self.borderColor.r, self.borderColor.g, self.borderColor.b, profile.borderAlpha)
 	else
 		KTF.Buttons:SetBackdrop(nil)
 	end
 
-	KTF.Bar.texture:SetColorTexture(self.borderColor.r, self.borderColor.g, self.borderColor.b, db.borderAlpha)
+	KTF.Bar.texture:SetColorTexture(self.borderColor.r, self.borderColor.g, self.borderColor.b, profile.borderAlpha)
 
-	if db.bgr == "None" and db.border == "None" then
+	if profile.bgr == "None" and profile.border == "None" then
 		KTF.Scroll:SetHitRectInsets(-150, 0, 0, 0.1)
 	else
 		KTF.Scroll:SetHitRectInsets(0.1, 0, 0, 0.1)
     end
 
-    OTFHeader.Title:SetJustifyH(db.bgr == "None" and "RIGHT" or "LEFT")
+    OTFHeader.Title:SetJustifyH(profile.bgr == "None" and "RIGHT" or "LEFT")
 end
 
 function KT:SetText(forced)
@@ -1562,9 +1562,9 @@ function KT:SetText(forced)
 		self.skinID = self.skinID + 1
 	end
 
-	self.font = LSM:Fetch("font", db.font)
+	self.font = LSM:Fetch("font", profile.font)
 
-	KT.OBJECTIVE_TRACKER_DOUBLE_LINE_HEIGHT = (2 * db.fontSize) + 1
+	KT.OBJECTIVE_TRACKER_DOUBLE_LINE_HEIGHT = (2 * profile.fontSize) + 1
 
 	-- Headers
 	SetHeaders("text")
@@ -1572,13 +1572,13 @@ function KT:SetText(forced)
 	-- Others
 	if WOW_PROJECT_ID >= WOW_PROJECT_MISTS_CLASSIC then
 		if ScenarioBlocksFrame.KTskinID ~= KT.skinID then
-			ScenarioStageBlock.Stage:SetFont(self.font, db.fontSize+5, db.fontFlag)
-			ScenarioStageBlock.Name:SetFont(self.font, db.fontSize, db.fontFlag)
-			ScenarioStageBlock.CompleteLabel:SetFont(self.font, db.fontSize+5, db.fontFlag)
-			ScenarioBonusHeader.Label:SetFont(self.font, db.fontSize, db.fontFlag)
+			ScenarioStageBlock.Stage:SetFont(self.font, profile.fontSize+5, profile.fontFlag)
+			ScenarioStageBlock.Name:SetFont(self.font, profile.fontSize, profile.fontFlag)
+			ScenarioStageBlock.CompleteLabel:SetFont(self.font, profile.fontSize+5, profile.fontFlag)
+			ScenarioBonusHeader.Label:SetFont(self.font, profile.fontSize, profile.fontFlag)
 			ScenarioChallengeModeBlock.TimeLeft:SetFont(LSM:Fetch("font", "Arial Narrow"), 19, "")
-			ScenarioProvingGroundsBlock.WaveLabel:SetFont(self.font, db.fontSize+2, db.fontFlag)
-			ScenarioProvingGroundsBlock.Wave:SetFont(self.font, db.fontSize+2, db.fontFlag)
+			ScenarioProvingGroundsBlock.WaveLabel:SetFont(self.font, profile.fontSize+2, profile.fontFlag)
+			ScenarioProvingGroundsBlock.Wave:SetFont(self.font, profile.fontSize+2, profile.fontFlag)
 			ScenarioBlocksFrame.KTskinID = KT.skinID
 		end
 	end
@@ -1603,7 +1603,7 @@ function KT:SetHeaderText(module, append)
 end
 
 function KT:SetQuestsHeaderText(reset)
-	if db.questsHeaderTitleAppend then
+	if profile.questsHeaderTitleAppend then
 		local _, numQuests = GetNumQuestLogEntries()
 		self:SetHeaderText(QUEST_TRACKER_MODULE, numQuests.."/"..MAX_QUESTLOG_QUESTS)
 	elseif reset then
@@ -1613,7 +1613,7 @@ end
 
 function KT:SetAchievementsHeaderText(reset)
 	if WOW_PROJECT_ID < WOW_PROJECT_WRATH_CLASSIC then return end
-	if db.achievementsHeaderTitleAppend then
+	if profile.achievementsHeaderTitleAppend then
 		self:SetHeaderText(ACHIEVEMENT_TRACKER_MODULE, GetTotalAchievementPoints())
 	elseif reset then
 		self:SetHeaderText(ACHIEVEMENT_TRACKER_MODULE)
@@ -1621,7 +1621,7 @@ function KT:SetAchievementsHeaderText(reset)
 end
 
 function KT:ToggleOtherButtons()
-	if db.headerOtherButtons then
+	if profile.headerOtherButtons then
 		local button
 		-- Achievements button
 		if WOW_PROJECT_ID >= WOW_PROJECT_WRATH_CLASSIC then
@@ -1697,18 +1697,18 @@ function KT:MoveButtons()
 		local point, xOfs, yOfs
 		if KTF.anchorLeft then
 			point = "LEFT"
-			xOfs = KTF:GetRight() and KTF:GetRight() + db.qiXOffset
+			xOfs = KTF:GetRight() and KTF:GetRight() + profile.qiXOffset
 		else
 			point = "RIGHT"
-			xOfs = KTF:GetLeft() and KTF:GetLeft() - db.qiXOffset
+			xOfs = KTF:GetLeft() and KTF:GetLeft() - profile.qiXOffset
 		end
-		local hMod = 2 * (4 - db.bgrInset)
+		local hMod = 2 * (4 - profile.bgrInset)
 		local yMod = 0
-		if not db.qiBgrBorder then
+		if not profile.qiBgrBorder then
 			hMod = hMod + 4
-			yMod = 2 + (4 - db.bgrInset)
+			yMod = 2 + (4 - profile.bgrInset)
 		end
-		if KTF.directionUp and (db.maxHeight+hMod) < KTF.Buttons:GetHeight() then
+		if KTF.directionUp and (profile.maxHeight+hMod) < KTF.Buttons:GetHeight() then
 			point = "BOTTOM"..point
 			yOfs = KTF:GetBottom() and KTF:GetBottom() - yMod
 		else
@@ -1819,16 +1819,16 @@ function KT:ToggleEmptyTracker(added)
 	if self:IsTrackerEmpty() then
 		if not dbChar.collapsed then
 			ObjectiveTracker_Collapse()
-			self.forceExpand = (db.filterAuto[1] or db.filterAuto[2])
+			self.forceExpand = (profile.filterAuto[1] or profile.filterAuto[2])
 		end
 		KTF.MinimizeButton:GetNormalTexture():SetTexCoord(0, 0.5, 0.5, 0.75)
-		if db.hideEmptyTracker then
+		if profile.hideEmptyTracker then
 			alpha = 0
 			mouse = false
 		end
 	else
 		if dbChar.collapsed then
-			if self.forceExpand or (db.expandTrackerAfterTrack and added) then
+			if self.forceExpand or (profile.expandTrackerAfterTrack and added) then
 				ObjectiveTracker_Expand()
 				self.forceExpand = false
 			else
@@ -1843,7 +1843,7 @@ function KT:ToggleEmptyTracker(added)
 	if self.Filters:IsEnabled() then
 		KTF.FilterButton:EnableMouse(mouse)
 	end
-	if db.headerOtherButtons then
+	if profile.headerOtherButtons then
 		KTF.QuestLogButton:EnableMouse(mouse)
 		if WOW_PROJECT_ID >= WOW_PROJECT_WRATH_CLASSIC then
 			KTF.AchievementsButton:EnableMouse(mouse)
@@ -1858,7 +1858,7 @@ function KT:SetMessage(text, r, g, b, pattern, icon, x, y)
 	if icon then
 		x = x or 0
 		y = y or 0
-		if db.sink20OutputSink == "Blizzard" then
+		if profile.sink20OutputSink == "Blizzard" then
 			x = floor(x * 3)
 			y = y - 8
 		end
@@ -1873,9 +1873,9 @@ end
 
 function KT:UpdateHotkey()
 	local key = GetBindingKey("EXTRAACTIONBUTTON1")
-	if db.keyBindMinimize == key then
-		SetOverrideBinding(KTF, false, db.keyBindMinimize, nil)
-		db.keyBindMinimize = ""
+	if profile.keyBindMinimize == key then
+		SetOverrideBinding(KTF, false, profile.keyBindMinimize, nil)
+		profile.keyBindMinimize = ""
 	end
 end
 
@@ -1938,7 +1938,7 @@ end
 
 function KT:OnEnable()
 	KT.Utils.Log("|cff00ff00Enable|r - "..self:GetName())
-	db = self.db.profile
+	profile = self.db.profile
 	dbChar = self.db.char
 
 	self:Alert_ResetIncompatibleProfiles("3.1.0")
@@ -1967,5 +1967,5 @@ function KT:OnEnable()
 		self.db.global.version = self.VERSION
 	end
 
-	db.modulesOrder = self.ReconcileOrder(self.BLIZZARD_MODULES, db.modulesOrder)
+	profile.modulesOrder = self.ReconcileOrder(self.BLIZZARD_MODULES, profile.modulesOrder)
 end

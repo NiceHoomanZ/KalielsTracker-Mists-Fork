@@ -34,7 +34,7 @@ function KT.SoundKits.AppendOptions(section, profile)
                 name = "Listen",
                 type = "execute",
                 func = function()
-                    KT.SoundKits.PlaySoundKit(profile.useRandomSoundKit, profile.selectedSoundKits)
+                    KT.SoundKits.PlaySoundKits(profile.useRandomSoundKit, profile.selectedSoundKits)
                 end,
                 width = "half",
                 order = 2
@@ -43,24 +43,15 @@ function KT.SoundKits.AppendOptions(section, profile)
                 name = "Sound kit",
                 type = "multiselect",
                 values = KT.SoundKits.GetAvailableSoundKitNames(),
-                -- TODO Implements
                 get = function(self, keyIndex)
                     if profile.selectedSoundKits[keyIndex] then return keyIndex end
                 end,
                 set = function(self, keyIndex, isSelected)
-                    local printableBool
-                    if isSelected then printableBool = "true" else printableBool = "false" end
-
-                    KT.Utils.Log(keyIndex)
-                    KT.Utils.Log("Is selected =>".. printableBool)
-
                     if isSelected then
-                        table.insert(profile.selectedSoundKits, keyIndex, keyIndex)
+                        profile.selectedSoundKits[keyIndex] = keyIndex
                     else 
-                        table.remove(profile.selectedSoundKits, keyIndex)
+                        profile.selectedSoundKits[keyIndex] = nil
                     end
-
-                    KT.Utils.Log(KT.Utils.Dump(profile.selectedSoundKits, 2))
                 end,
                 order = 3,
                 disabled = function()
