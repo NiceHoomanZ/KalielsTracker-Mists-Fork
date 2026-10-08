@@ -580,7 +580,7 @@ local options = {
 						},
 					},
 				},
-				sec4 = {
+				headerSection = {
 					name = "Headers",
 					type = "group",
 					inline = true,
@@ -643,7 +643,7 @@ local options = {
 							order = 4.13,
 						},
 						headerTxtLabel = {
-							name = " Text",
+							name = "Text",
 							type = "description",
 							width = "half",
 							fontSize = "medium",
@@ -947,7 +947,7 @@ local options = {
 					order = 8,
 					args = {
 						soundQuest = {
-							name = "Quest sounds",
+							name = "Quest sound",
 							type = "toggle",
 							set = function()
 								profile.soundQuest = not profile.soundQuest
@@ -1397,7 +1397,7 @@ end
 
 function SetSharedColor(color)
 	local name = "Use border |cff"..KT.RgbToHex(color).."color|r"
-	local sec4 = general.sec4.args
+	local sec4 = general.headerSection.args
 	sec4.headerBgrColorShare.name = name
 	sec4.headerTxtColorShare.name = name
 	sec4.headerBtnColorShare.name = name

@@ -1,5 +1,4 @@
 -- TODO Move the source csv to a folder external to the addon
--- TODO Fix bottom of settings not being displayed fully
 
 local _, addon = ...
 ---@class KT
