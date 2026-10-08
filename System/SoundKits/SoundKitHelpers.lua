@@ -13,7 +13,6 @@ KT.SoundKits = SoundKits;
 ---@type SoundKits.SoundKit[]?
 local availableSoundKits = nil
 
----@private
 ---@return SoundKits.SoundKit[]
 function SoundKits.GetAvailableSoundKits()
     if availableSoundKits ~= nil then return availableSoundKits end
