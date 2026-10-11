@@ -2,7 +2,6 @@ local _, addon = ...
 ---@class KT
 local KT = addon
 
--- TODO Better layout
 --- Append sound kit related option to the section passed as parameter
 ---@param section any The section to modify
 ---@param profile KT.Profile

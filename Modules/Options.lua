@@ -29,7 +29,13 @@ local strsub = string.sub
 ---@field useRandomSoundKit boolean
 ---@field selectedSoundKits { [integer]: integer }
 local profile
+
 local anchors = { "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT" }
+
+local QUEST_BAR_ANCHORS_OPTIONS = { "AUTO", "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "CENTER", "TOP", "BOTTOM", "LEFT", "RIGHT" }
+local SCREEN_HEIGHT = math.floor(GetScreenHeight())
+local SCREEN_WIDTH = math.floor(GetScreenWidth())
+
 local strata = { "LOW", "MEDIUM", "HIGH" }
 local flags = { [""] = "None", ["OUTLINE"] = "Outline", ["OUTLINE, MONOCHROME"] = "Outline Monochrome" }
 local textures = { "None", "Default (Blizzard)", "One line", "Two lines" }
@@ -90,9 +96,11 @@ local defaults = {
 		headerOtherButtons = true,
 		keyBindMinimize = "",
 		
-		questItemBackgroundBorder = false,
-		questItemXOffset = -5,
-		questItemYOffset = 0,
+		questBarBtnBackgroundBorder = false,
+		anchorQuestBar = true,
+		questBarAnchor = "AUTO",
+		questBarXOffset = -5,
+		questBarYOffset = 0,
 
 		hideEmptyTracker = false,
 		collapseInInstance = false,
@@ -346,7 +354,7 @@ local options = {
 							set = function(_, value)
 								profile.frameStrata = strata[value]
 								KTF:SetFrameStrata(strata[value])
-								KTF.Buttons:SetFrameStrata(strata[value])
+								KTF.QuestButtonBar:SetFrameStrata(strata[value])
 							end,
 							order = 1.8,
 						},
@@ -399,7 +407,7 @@ local options = {
 							set = function(_, value)
 								profile.border = value
 								KT:SetBackground()
-								KT:MoveQuestItemBar()
+								KT:MoveQuestButtonBar()
 							end,
 							order = 2.3,
 						},
@@ -477,7 +485,7 @@ local options = {
 							set = function(_, value)
 								profile.bgrInset = value
 								KT:SetBackground()
-								KT:MoveQuestItemBar()
+								KT:MoveQuestButtonBar()
 							end,
 							order = 2.8,
 						},
@@ -824,36 +832,74 @@ local options = {
 							type = "toggle",
 							width = "double",
 							set = function()
-								profile.questItemBackgroundBorder = not profile.questItemBackgroundBorder
+								profile.questBarBtnBackgroundBorder = not profile.questBarBtnBackgroundBorder
 								KT:SetBackground()
-								KT:MoveQuestItemBar()
+								KT:MoveQuestButtonBar()
 							end,
 							order = 5.1,
+						},
+						anchorToggle = {
+							name = "Anchor to tracker",
+							desc = "Anchor the quest button bar to the quest tracker",
+							type = "toggle",
+							get = function () return profile.anchorQuestBar end,
+							set = function() 
+								profile.anchorQuestBar = not profile.anchorQuestBar 
+								profile.questBarXOffset = 0
+								profile.questBarYOffset = 0
+								KT:MoveQuestButtonBar()
+								OverlayFrameUpdate()
+								end,
+							order = 5.11,
+						},
+						anchorPoint = {
+							name = "Anchor point",
+							desc = "- Default: "..defaults.profile.questBarAnchor,
+							type = "select",
+							values = QUEST_BAR_ANCHORS_OPTIONS,
+							get = function()
+								for key, value in ipairs(QUEST_BAR_ANCHORS_OPTIONS) do
+									if profile.questBarAnchor == value then
+										return key
+									end
+								end
+							end,
+							set = function(_, value)
+								profile.questBarAnchor = QUEST_BAR_ANCHORS_OPTIONS[value]
+								profile.questBarXOffset = 0
+								profile.questBarYOffset = 0
+								KT:MoveQuestButtonBar()
+								OverlayFrameUpdate()
+							end,
+							order = 5.12,
 						},
 						xOffsetRange = {
 							name = "X offset",
 							type = "range",
-							min = -100,
-							max = 100,
+							min = -SCREEN_WIDTH,
+							max = SCREEN_WIDTH,
 							step = 1,
 							get = function()
-								return profile.questItemXOffset
+								return profile.questBarXOffset
 							end,
 							set = function(_, value)
-								profile.questItemXOffset = value
-								KT:MoveQuestItemBar()
+								profile.questBarXOffset = value
+								KT:MoveQuestButtonBar()
 							end,
 							order = 5.2,
 						},
 						yOffsetRange = {
 							name = "Y offset",
 							type = "range",
-							min = -100,
-							max = 100,
+							min = -SCREEN_HEIGHT,
+							max = SCREEN_HEIGHT,
 							step = 1,
+							get = function()
+								return profile.questBarYOffset
+							end,
 							set = function(_, value)
-								profile.questItemYOffset = value
-								KT:MoveQuestItemBar()
+								profile.questBarYOffset = value
+								KT:MoveQuestButtonBar()
 							end,
 							order = 5.3,
 						}

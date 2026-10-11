@@ -274,7 +274,7 @@ local function SetFrames()
 			KT:RemoveFixedButton()
 			ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.COMBAT_STOP)
 		elseif event == "ZONE_CHANGED_NEW_AREA" or event == "ZONE_CHANGED" then
-			KTF.Buttons.reanchor = (KTF.Buttons.num > 0)
+			KTF.QuestButtonBar.reanchor = (KTF.QuestButtonBar.num > 0)
 		elseif event == "UPDATE_BINDINGS" then
 			KT:UpdateHotkey()
 		elseif event == "PLAYER_LEVEL_UP" then
@@ -412,15 +412,15 @@ local function SetFrames()
 	KT:ToggleOtherButtons()
 
 	-- Buttons frame
-	local Buttons = CreateFrame("Frame", addonName.."_QuestButtonBar", UIParent, "BackdropTemplate")
-	Buttons:SetSize(40, 40)
-	Buttons:SetPoint("TOPLEFT", 0, 0)
-	Buttons:SetFrameStrata(profile.frameStrata)
-	Buttons:SetFrameLevel(KTF:GetFrameLevel() - 1)
-	Buttons:SetAlpha(0)
-	Buttons.num = 0
-	Buttons.reanchor = false
-	KTF.Buttons = Buttons
+	local questButtonBar = CreateFrame("Frame", addonName.."_QuestButtonBar", UIParent, "BackdropTemplate")
+	questButtonBar:SetSize(40, 40)
+	questButtonBar:SetPoint("TOPLEFT", 0, 0)
+	questButtonBar:SetFrameStrata(profile.frameStrata)
+	questButtonBar:SetFrameLevel(KTF:GetFrameLevel() - 1)
+	questButtonBar:SetAlpha(0)
+	questButtonBar.num = 0
+	questButtonBar.reanchor = false
+	KTF.QuestButtonBar = questButtonBar
 end
 
 -- Hooks ---------------------------------------------------------------------------------------------------------------
@@ -443,11 +443,11 @@ local function SetHooks()
 
 	local function FixedButtonsReanchor()
 		if InCombatLockdown() then
-			if KTF.Buttons.num > 0 then
+			if KTF.QuestButtonBar.num > 0 then
 				combatLockdown = true
 			end
 		else
-			if KTF.Buttons.reanchor then
+			if KTF.QuestButtonBar.reanchor then
 				local yOfs
 				local idx = 0
 				local contentsHeight = 0
@@ -464,20 +464,20 @@ local function SetHooks()
 				if contentsHeight > 0 then
 					contentsHeight = contentsHeight + 7 + 4
 				end
-				KTF.Buttons:SetHeight(contentsHeight)
-				KTF.Buttons.num = idx
-				KTF.Buttons.reanchor = false
+				KTF.QuestButtonBar:SetHeight(contentsHeight)
+				KTF.QuestButtonBar.num = idx
+				KTF.QuestButtonBar.reanchor = false
 			end
-			if dbChar.collapsed or KTF.Buttons.num == 0 then
-				KTF.Buttons:Hide()
+			if dbChar.collapsed or KTF.QuestButtonBar.num == 0 then
+				KTF.QuestButtonBar:Hide()
 			else
-				KTF.Buttons:SetShown(not KT.locked)
+				KTF.QuestButtonBar:SetShown(not KT.locked)
 			end
 		end
-		if dbChar.collapsed or KTF.Buttons.num == 0 then
-			KTF.Buttons:SetAlpha(0)
+		if dbChar.collapsed or KTF.QuestButtonBar.num == 0 then
+			KTF.QuestButtonBar:SetAlpha(0)
 		else
-			KTF.Buttons:SetAlpha(1)
+			KTF.QuestButtonBar:SetAlpha(1)
 		end
 	end
 
@@ -824,7 +824,7 @@ local function SetHooks()
 	local function CreateQuestButton(questID)
 		KT.Utils.Log("Create new quest button for quest: "..questID)
 		local name = addonName.."_QuestButton_"..questID
-		local button = CreateFrame("Button", name, KTF.Buttons, "SecureActionButtonTemplate")
+		local button = CreateFrame("Button", name, KTF.QuestButtonBar, "SecureActionButtonTemplate")
 		button:SetSize(26, 26)
 
 		button.icon = button:CreateTexture(name.."_Icon", "BORDER")
@@ -924,7 +924,7 @@ local function SetHooks()
 
 			button:Show()
 			KT.fixedButtons[questID] = button
-			KTF.Buttons.reanchor = true
+			KTF.QuestButtonBar.reanchor = true
 		end
 
 		button.block = block
@@ -1435,7 +1435,7 @@ function KT:SetSize()
 			KTF:SetHeight(height)
 			KTF.height = height
 		end
-		self:MoveQuestItemBar()
+		self:MoveQuestButtonBar()
 	else
 		-- width
 		if profile.headerCollapsedTxt == 1 then
@@ -1499,12 +1499,12 @@ function KT:MoveTracker()
 	options.maxHeight.max = self.screenHeight - abs(profile.yOffset)
 	profile.maxHeight = (abs(profile.yOffset)+profile.maxHeight > self.screenHeight) and options.maxHeight.max or profile.maxHeight
 
-	self:MoveQuestItemBar()
+	self:MoveQuestButtonBar()
 end
 
 function KT:SetShown(show)
 	KTF:SetShown(show)
-	KTF.Buttons:SetShown(show)
+	KTF.QuestButtonBar:SetShown(show)
 end
 
 function KT:SetBackground()
@@ -1538,12 +1538,12 @@ function KT:SetBackground()
 		end
 	end
 
-	if profile.questItemBackgroundBorder then
-		KTF.Buttons:SetBackdrop(backdrop)
-		KTF.Buttons:SetBackdropColor(profile.bgrColor.r, profile.bgrColor.g, profile.bgrColor.b, profile.bgrColor.a)
-		KTF.Buttons:SetBackdropBorderColor(self.borderColor.r, self.borderColor.g, self.borderColor.b, profile.borderAlpha)
+	if profile.questBarBtnBackgroundBorder then
+		KTF.QuestButtonBar:SetBackdrop(backdrop)
+		KTF.QuestButtonBar:SetBackdropColor(profile.bgrColor.r, profile.bgrColor.g, profile.bgrColor.b, profile.bgrColor.a)
+		KTF.QuestButtonBar:SetBackdropBorderColor(self.borderColor.r, self.borderColor.g, self.borderColor.b, profile.borderAlpha)
 	else
-		KTF.Buttons:SetBackdrop(nil)
+		KTF.QuestButtonBar:SetBackdrop(nil)
 	end
 
 	KTF.Bar.texture:SetColorTexture(self.borderColor.r, self.borderColor.g, self.borderColor.b, profile.borderAlpha)
@@ -1692,36 +1692,48 @@ function KT:ToggleOtherButtons()
 	end
 end
 
-function KT:MoveQuestItemBar()
+function KT:MoveQuestButtonBar()
 	if InCombatLockdown() then return end
-	
+
+	local parentAnchor = "BOTTOMLEFT"
 	local point, xOfs, yOfs
 	if KTF.anchorLeft then
 		point = "LEFT"
-		xOfs = KTF:GetRight() and KTF:GetRight() + profile.questItemXOffset
+		xOfs = KTF:GetRight() and KTF:GetRight() + profile.questBarXOffset
 	else
 		point = "RIGHT"
-		xOfs = KTF:GetLeft() and KTF:GetLeft() - profile.questItemXOffset
+		xOfs = KTF:GetLeft() and KTF:GetLeft() - profile.questBarXOffset
 	end
 
 	local hMod = 2 * (4 - profile.bgrInset)
 	local yMod = 0
-	if not profile.questItemBackgroundBorder then
+	if not profile.questBarBtnBackgroundBorder then
 		hMod = hMod + 4
 		yMod = 2 + (4 - profile.bgrInset)
 	end
 
-	if KTF.directionUp and (profile.maxHeight + hMod) < KTF.Buttons:GetHeight() then
+	if KTF.directionUp and (profile.maxHeight + hMod) < KTF.QuestButtonBar:GetHeight() then
 		point = "BOTTOM"..point
-		yOfs = KTF:GetBottom() and KTF:GetBottom() - yMod - profile.questItemYOffset
+		yOfs = KTF:GetBottom() and KTF:GetBottom() - yMod - profile.questBarYOffset
 	else
 		point = "TOP"..point
-		yOfs = KTF:GetTop() and KTF:GetTop() + yMod + profile.questItemYOffset
+		yOfs = KTF:GetTop() and KTF:GetTop() + yMod + profile.questBarYOffset
 	end
 
+	if not profile.anchorQuestBar then
+		xOfs = profile.questBarXOffset
+		yOfs = profile.questBarYOffset
+		if profile.questBarAnchor == "AUTO" then
+			parentAnchor = "CENTER"
+		else
+			parentAnchor = profile.questBarAnchor
+		end
+	end
+
+
 	if xOfs and yOfs then
-		KTF.Buttons:ClearAllPoints()
-		KTF.Buttons:SetPoint(point, UIParent, "BOTTOMLEFT", xOfs, yOfs)
+		KTF.QuestButtonBar:ClearAllPoints()
+		KTF.QuestButtonBar:SetPoint(point, UIParent, parentAnchor, xOfs, yOfs)
 		end
 end
 
@@ -1746,7 +1758,7 @@ function KT:RemoveFixedButton(block)
 				tinsert(freeButtons, button)
 				self.fixedButtons[questID] = nil
 				button:Hide()
-				KTF.Buttons.reanchor = true
+				KTF.QuestButtonBar.reanchor = true
 			end
 		end
 	else
@@ -1756,7 +1768,7 @@ function KT:RemoveFixedButton(block)
 			self.fixedButtons[questID] = nil
 			button:Hide()
 		end
-		KTF.Buttons.reanchor = true
+		KTF.QuestButtonBar.reanchor = true
 	end
 end
 

@@ -29,7 +29,7 @@ local KTwarning = "  |cff00ffffAddon "..KT.TITLE.." is active.  "
 local function ElvUI_SetSupport()
     if KT:CheckAddOn("ElvUI", "v14.06", true) then
         KT.frame:SetScale(1)
-        KT.frame.Buttons:SetScale(1)
+        KT.frame.QuestButtonBar:SetScale(1)
         local E = unpack(_G.ElvUI)
         local B = E:GetModule("Blizzard")
         if KT.IsClassicEra() then
@@ -47,7 +47,7 @@ end
 local function Tukui_SetSupport()
     if KT:CheckAddOn("Tukui", "v20.463", true) then
         KT.frame:SetScale(1)
-        KT.frame.Buttons:SetScale(1)
+        KT.frame.QuestButtonBar:SetScale(1)
         local T = unpack(_G.Tukui)
         T.Miscellaneous.ObjectiveTracker.Enable = function() end
     end

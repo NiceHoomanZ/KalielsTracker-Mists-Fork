@@ -379,7 +379,7 @@ local function SetupTutorials()
 					ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.FORCED)
 				end
 			elseif i == 5 then
-				self[i].shine = KTF.Buttons
+				self[i].shine = KTF.QuestButtonBar
 			end
 			end,
 		onHide = function()
