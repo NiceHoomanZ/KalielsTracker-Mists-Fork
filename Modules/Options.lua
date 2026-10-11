@@ -90,8 +90,9 @@ local defaults = {
 		headerOtherButtons = true,
 		keyBindMinimize = "",
 		
-		qiBgrBorder = false,
-		qiXOffset = -5,
+		questItemBackgroundBorder = false,
+		questItemXOffset = -5,
+		questItemYOffset = 0,
 
 		hideEmptyTracker = false,
 		collapseInInstance = false,
@@ -398,7 +399,7 @@ local options = {
 							set = function(_, value)
 								profile.border = value
 								KT:SetBackground()
-								KT:MoveButtons()
+								KT:MoveQuestItemBar()
 							end,
 							order = 2.3,
 						},
@@ -476,7 +477,7 @@ local options = {
 							set = function(_, value)
 								profile.bgrInset = value
 								KT:SetBackground()
-								KT:MoveButtons()
+								KT:MoveQuestItemBar()
 							end,
 							order = 2.8,
 						},
@@ -812,34 +813,49 @@ local options = {
 						},
 					},
 				},
-				sec5 = {
+				questItemSection = {
 					name = "Quest item buttons",
 					type = "group",
 					inline = true,
 					order = 5,
 					args = {
-						qiBgrBorder = {
+						backgroundBorderToggle = {
 							name = "Show buttons block background and border",
 							type = "toggle",
 							width = "double",
 							set = function()
-								profile.qiBgrBorder = not profile.qiBgrBorder
+								profile.questItemBackgroundBorder = not profile.questItemBackgroundBorder
 								KT:SetBackground()
-								KT:MoveButtons()
+								KT:MoveQuestItemBar()
 							end,
 							order = 5.1,
 						},
-						qiXOffset = {
+						xOffsetRange = {
 							name = "X offset",
 							type = "range",
-							min = -10,
-							max = 10,
+							min = -100,
+							max = 100,
 							step = 1,
+							get = function()
+								return profile.questItemXOffset
+							end,
 							set = function(_, value)
-								profile.qiXOffset = value
-								KT:MoveButtons()
+								profile.questItemXOffset = value
+								KT:MoveQuestItemBar()
 							end,
 							order = 5.2,
+						},
+						yOffsetRange = {
+							name = "Y offset",
+							type = "range",
+							min = -100,
+							max = 100,
+							step = 1,
+							set = function(_, value)
+								profile.questItemYOffset = value
+								KT:MoveQuestItemBar()
+							end,
+							order = 5.3,
 						}
 					},
 				},

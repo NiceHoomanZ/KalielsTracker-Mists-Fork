@@ -1435,7 +1435,7 @@ function KT:SetSize()
 			KTF:SetHeight(height)
 			KTF.height = height
 		end
-		self:MoveButtons()
+		self:MoveQuestItemBar()
 	else
 		-- width
 		if profile.headerCollapsedTxt == 1 then
@@ -1499,7 +1499,7 @@ function KT:MoveTracker()
 	options.maxHeight.max = self.screenHeight - abs(profile.yOffset)
 	profile.maxHeight = (abs(profile.yOffset)+profile.maxHeight > self.screenHeight) and options.maxHeight.max or profile.maxHeight
 
-	self:MoveButtons()
+	self:MoveQuestItemBar()
 end
 
 function KT:SetShown(show)
@@ -1538,7 +1538,7 @@ function KT:SetBackground()
 		end
 	end
 
-	if profile.qiBgrBorder then
+	if profile.questItemBackgroundBorder then
 		KTF.Buttons:SetBackdrop(backdrop)
 		KTF.Buttons:SetBackdropColor(profile.bgrColor.r, profile.bgrColor.g, profile.bgrColor.b, profile.bgrColor.a)
 		KTF.Buttons:SetBackdropBorderColor(self.borderColor.r, self.borderColor.g, self.borderColor.b, profile.borderAlpha)
@@ -1692,34 +1692,37 @@ function KT:ToggleOtherButtons()
 	end
 end
 
-function KT:MoveButtons()
-	if not InCombatLockdown() then
-		local point, xOfs, yOfs
-		if KTF.anchorLeft then
-			point = "LEFT"
-			xOfs = KTF:GetRight() and KTF:GetRight() + profile.qiXOffset
-		else
-			point = "RIGHT"
-			xOfs = KTF:GetLeft() and KTF:GetLeft() - profile.qiXOffset
-		end
-		local hMod = 2 * (4 - profile.bgrInset)
-		local yMod = 0
-		if not profile.qiBgrBorder then
-			hMod = hMod + 4
-			yMod = 2 + (4 - profile.bgrInset)
-		end
-		if KTF.directionUp and (profile.maxHeight+hMod) < KTF.Buttons:GetHeight() then
-			point = "BOTTOM"..point
-			yOfs = KTF:GetBottom() and KTF:GetBottom() - yMod
-		else
-			point = "TOP"..point
-			yOfs = KTF:GetTop() and KTF:GetTop() + yMod
-		end
-		if xOfs and yOfs then
-			KTF.Buttons:ClearAllPoints()
-			KTF.Buttons:SetPoint(point, UIParent, "BOTTOMLEFT", xOfs, yOfs)
-		end
+function KT:MoveQuestItemBar()
+	if InCombatLockdown() then return end
+	
+	local point, xOfs, yOfs
+	if KTF.anchorLeft then
+		point = "LEFT"
+		xOfs = KTF:GetRight() and KTF:GetRight() + profile.questItemXOffset
+	else
+		point = "RIGHT"
+		xOfs = KTF:GetLeft() and KTF:GetLeft() - profile.questItemXOffset
 	end
+
+	local hMod = 2 * (4 - profile.bgrInset)
+	local yMod = 0
+	if not profile.questItemBackgroundBorder then
+		hMod = hMod + 4
+		yMod = 2 + (4 - profile.bgrInset)
+	end
+
+	if KTF.directionUp and (profile.maxHeight + hMod) < KTF.Buttons:GetHeight() then
+		point = "BOTTOM"..point
+		yOfs = KTF:GetBottom() and KTF:GetBottom() - yMod - profile.questItemYOffset
+	else
+		point = "TOP"..point
+		yOfs = KTF:GetTop() and KTF:GetTop() + yMod + profile.questItemYOffset
+	end
+
+	if xOfs and yOfs then
+		KTF.Buttons:ClearAllPoints()
+		KTF.Buttons:SetPoint(point, UIParent, "BOTTOMLEFT", xOfs, yOfs)
+		end
 end
 
 function KT:RemoveFixedButton(block)
