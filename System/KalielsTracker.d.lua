@@ -15,3 +15,9 @@
 ---@field charges number
 ---@field link string
 ---@field item number
+
+---@alias Direction
+---|"Up"
+---|"Down"
+---|"Left"
+---|"Right"

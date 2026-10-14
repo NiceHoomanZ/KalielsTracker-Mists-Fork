@@ -274,7 +274,7 @@ local function SetFrames()
 			KT:RemoveQuestButton()
 			ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.COMBAT_STOP)
 		elseif event == "ZONE_CHANGED_NEW_AREA" or event == "ZONE_CHANGED" then
-			KTF.QuestButtonBar.shouldReanchor = (KTF.QuestButtonBar.buttonCount > 0)
+			KTF.QuestButtonBar.shouldRefresh = (KTF.QuestButtonBar.buttonCount > 0)
 		elseif event == "UPDATE_BINDINGS" then
 			KT:UpdateHotkey()
 		elseif event == "PLAYER_LEVEL_UP" then
@@ -419,7 +419,7 @@ local function SetFrames()
 	questButtonBar:SetFrameLevel(KTF:GetFrameLevel() - 1)
 	questButtonBar:SetAlpha(0)
 	questButtonBar.buttonCount = 0
-	questButtonBar.shouldReanchor = false
+	questButtonBar.shouldRefresh = false
 	KTF.QuestButtonBar = questButtonBar
 end
 
@@ -431,19 +431,39 @@ local function SetHooks()
 	---@param index integer button index
 	local function SetQuestIndexTexts(questBlock, index)
 		questBlock.fixedTag.text:SetText(index)
-		KT.questButtons[questBlock.id].text:SetText(index)
-		KT.questButtons[questBlock.id].num = index
+		KT.questButtons[questBlock.id].text:SetText(index --[[@as string]])
+	end
+
+	---@param btn KT.QuestButton
+	---@param index integer
+	---@param direction Direction
+	local function PositionQuestButton(btn, index, direction)
+		local absOffset = index * (KT.QUEST_BUTTON.SIZE + KT.QUEST_BUTTON.SPACING)
+		---@type number, number, FramePoint, FramePoint
+		local xOffset, yOffset, fromAnchor, toAnchor = 0, 0, nil, nil
+
+		if direction == "Up" then
+			fromAnchor = "BOTTOM"; toAnchor = "TOP"; yOffset = absOffset
+		elseif direction == "Down" then
+			fromAnchor = "TOP"; toAnchor = "BOTTOM"; yOffset = -absOffset
+		elseif direction == "Left" then
+			fromAnchor = "RIGHT"; toAnchor = "LEFT"; xOffset = -absOffset
+		elseif direction == "Right" then
+			fromAnchor = "LEFT"; toAnchor = "RIGHT"; xOffset = absOffset
+		else
+			KT.Utils.LogError("Impossible to place quest button toward an incorect dicrection : "..direction)
+		end
+
+		btn:SetPoint(toAnchor, btn:GetParent(), fromAnchor, xOffset, yOffset)
 	end
 
 	---Set quest block text index, quest button text index and button position = negative Y offset from top
 	---@param questBlock KT.QuestBlock The associated quest block
 	---@param index integer button index
-	local function SetupQuestButton(questBlock, index)
+	---@param direction Direction
+	local function SetupQuestButton(questBlock, index, direction)
 		SetQuestIndexTexts(questBlock, index)
-
-		local yOffset = index * (KT.QUEST_BUTTON.SIZE + KT.QUEST_BUTTON.SPACING)
-		local btn = KT.questButtons[questBlock.id]
-		btn:SetPoint("BOTTOM", btn:GetParent(), "TOP", 0, -yOffset)
+		PositionQuestButton(KT.questButtons[questBlock.id], index, direction)
 	end
 
 	---Resize quest button bar, 
@@ -458,27 +478,30 @@ local function SetHooks()
 			return
 		end
 
-		if KTF.QuestButtonBar.shouldReanchor then
+		if KTF.QuestButtonBar.shouldRefresh then
 			KT.Utils.Log("Refresh quest button bar")
 
 			local questBlocks = QUEST_TRACKER_MODULE:GetQuestBlocksWithButton()
 			local btnCount = #questBlocks
 
+			-- TODO Fetch direction from settings
 			for index, questBlock in ipairs(questBlocks) do
-				SetupQuestButton(questBlock, index)
+				SetupQuestButton(questBlock, index, "Down")
 			end
 
-			local height
+			-- TODO Compute length for horizontal and vertical orientation
+			-- TODO Reanchor bar according to direction
+			local lenght
 			if btnCount <= 0 then
-				height = 0
+				lenght = 0
 			else
 				-- Space before + (N x (Button Size + Space After))
-				height = KT.QUEST_BUTTON.SPACING + (btnCount * (KT.QUEST_BUTTON.SIZE + KT.QUEST_BUTTON.SPACING))
+				lenght = KT.QUEST_BUTTON.SPACING + (btnCount * (KT.QUEST_BUTTON.SIZE + KT.QUEST_BUTTON.SPACING))
 			end
-			KTF.QuestButtonBar:SetHeight(height)
+			KTF.QuestButtonBar:SetHeight(lenght)
 			
 			KTF.QuestButtonBar.buttonCount = btnCount
-			KTF.QuestButtonBar.shouldReanchor = false
+			KTF.QuestButtonBar.shouldRefresh = false
 		end
 
 		if dbChar.collapsed or KTF.QuestButtonBar.buttonCount == 0 then
@@ -934,7 +957,7 @@ local function SetHooks()
 
 			button:Show()
 			KT.questButtons[questID] = button
-			KTF.QuestButtonBar.shouldReanchor = true
+			KTF.QuestButtonBar.shouldRefresh = true
 		end
 
 		button.block = questBlock
@@ -1767,7 +1790,7 @@ function KT:RemoveQuestButton(questBlock)
 				tinsert(questButtonPool, button)
 				self.questButtons[questID] = nil
 				button:Hide()
-				KTF.QuestButtonBar.shouldReanchor = true
+				KTF.QuestButtonBar.shouldRefresh = true
 			end
 		end
 	else
@@ -1777,7 +1800,7 @@ function KT:RemoveQuestButton(questBlock)
 			self.questButtons[questID] = nil
 			button:Hide()
 		end
-		KTF.QuestButtonBar.shouldReanchor = true
+		KTF.QuestButtonBar.shouldRefresh = true
 	end
 end
 
