@@ -413,7 +413,7 @@ local function SetFrames()
 
 	-- Buttons frame
 	local questButtonBar = CreateFrame("Frame", addonName.."_QuestButtonBar", UIParent, "BackdropTemplate")
-	questButtonBar:SetSize(40, 40)
+	questButtonBar:SetSize(KT.QUEST_BUTTON_BAR.SIZE, KT.QUEST_BUTTON_BAR.SIZE)
 	questButtonBar:SetPoint("TOPLEFT", 0, 0)
 	questButtonBar:SetFrameStrata(profile.frameStrata)
 	questButtonBar:SetFrameLevel(KTF:GetFrameLevel() - 1)
@@ -435,27 +435,15 @@ local function SetHooks()
 		KT.questButtons[questBlock.id].num = index
 	end
 
-	---Set quest block text index, quest button text index and button position = Y offset from top
+	---Set quest block text index, quest button text index and button position = negative Y offset from top
 	---@param questBlock KT.QuestBlock The associated quest block
 	---@param index integer button index
-	---@param questBarHeight integer cumulativ button bar's height
-	---@param yOffset integer button Y offset
-	---@return integer idx updated button index
-	---@return integer questBarHeight updated height
-	---@return integer yOfs updated Y offset
-	local function SetupQuestButton(questBlock, index, questBarHeight, yOffset)
-		if not questBlock.fixedTag or not KT.questButtons[questBlock.id] then
-			return index, questBarHeight, yOffset
-		end
-		
-		index = index + 1
+	local function SetupQuestButton(questBlock, index)
 		SetQuestIndexTexts(questBlock, index)
 
-		yOffset = -(questBarHeight + KT.QUEST_BUTTON.SPACING)
-		questBarHeight = questBarHeight + KT.QUEST_BUTTON.SIZE + 3
-		KT.questButtons[questBlock.id]:SetPoint("TOP", 0, yOffset)
-
-		return index, questBarHeight, yOffset
+		local yOffset = index * (KT.QUEST_BUTTON.SIZE + KT.QUEST_BUTTON.SPACING)
+		local btn = KT.questButtons[questBlock.id]
+		btn:SetPoint("BOTTOM", btn:GetParent(), "TOP", 0, -yOffset)
 	end
 
 	---Resize quest button bar, 
@@ -471,28 +459,30 @@ local function SetHooks()
 		end
 
 		if KTF.QuestButtonBar.shouldReanchor then
-			local yOfs
-			local btnCount = 0
-			local questBtnBarHeight = 0
-			-- Quest items
 			KT.Utils.Log("Reanchor quest buttons")
+
+			local btnCount = 0
 			for i = 1, GetNumQuestWatches() do
 				local questLogIndex = GetQuestIndexForWatch(i)
 				local questID = GetQuestIDFromLogIndex(questLogIndex)
 
 				local questBlock = QUEST_TRACKER_MODULE.usedBlocks[questID]
 
-				if questBlock and questBlock.itemButton then
-					btnCount, questBtnBarHeight, yOfs =
-						SetupQuestButton(questBlock, btnCount, questBtnBarHeight, yOfs)
+				if questBlock and questBlock.itemButton and questBlock.fixedTag and KT.questButtons[questBlock.id] then
+					btnCount = btnCount + 1
+					SetupQuestButton(questBlock, btnCount)
 				end
 			end
 
-			if questBtnBarHeight > 0 then
-				questBtnBarHeight = questBtnBarHeight + KT.QUEST_BUTTON.SIZE + 4
+			local questBtnBarHeight
+			if btnCount <= 0 then
+				questBtnBarHeight = 0
+			else
+				-- Space before + (N x (Button Size + Space After))
+				questBtnBarHeight = KT.QUEST_BUTTON.SPACING + (btnCount * (KT.QUEST_BUTTON.SIZE + KT.QUEST_BUTTON.SPACING))
 			end
-
 			KTF.QuestButtonBar:SetHeight(questBtnBarHeight)
+			
 			KTF.QuestButtonBar.buttonCount = btnCount
 			KTF.QuestButtonBar.shouldReanchor = false
 		end
@@ -860,6 +850,7 @@ local function SetHooks()
 	local function CreateQuestButton(questID)
 		KT.Utils.Log("Create new quest button for quest: "..questID)
 		local name = addonName.."_QuestButton_"..questID
+		---@type KT.QuestButton
 		local button = CreateFrame("Button", name, KTF.QuestButtonBar, "SecureActionButtonTemplate")
 		button:SetSize(KT.QUEST_BUTTON.SIZE, KT.QUEST_BUTTON.SIZE)
 

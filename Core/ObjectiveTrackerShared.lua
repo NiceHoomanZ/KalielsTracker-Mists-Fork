@@ -179,6 +179,7 @@ function QuestObjectiveReleaseBlockButton_FindGroup(block)
 	end
 end
 
+-- TODO This whole thing is useless I think
 ---@param questBlock KT.QuestBlock
 function QuestObjectiveSetupBlockButton_Item(questBlock, questLogIndex, isQuestComplete)
 	local _, item, _, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex);

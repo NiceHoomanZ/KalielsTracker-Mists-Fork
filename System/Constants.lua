@@ -130,6 +130,10 @@ if WOW_PROJECT_ID < WOW_PROJECT_WRATH_CLASSIC then
 end
 
 
+KT.QUEST_BUTTON_BAR = {
+    SIZE = 40, --- Height and width
+}
+
 KT.QUEST_BUTTON = {
     SIZE = 26, --- Height and width
     SPACING = 7
