@@ -134,3 +134,7 @@ KT.QUEST_BUTTON = {
     SIZE = 26, --- Height and width
     SPACING = 7
 }
+
+KT.QUEST_TAG = {
+    SIZE = 32, --- Height and width
+}

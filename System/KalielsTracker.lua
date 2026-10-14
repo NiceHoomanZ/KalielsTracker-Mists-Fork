@@ -37,7 +37,7 @@ local UIParent = UIParent
 local trackerWidth = 280
 local paddingBottom = 16
 local freeTagPool = {}
-local freeButtons = {}
+local questButtonPool = {}
 local msgPatterns = {}
 local combatLockdown = false
 ---@type KT.Profile
@@ -489,7 +489,7 @@ local function SetHooks()
 			end
 
 			if questBtnBarHeight > 0 then
-				questBtnBarHeight = questBtnBarHeight + 7 + 4
+				questBtnBarHeight = questBtnBarHeight + KT.QUEST_BUTTON.SIZE + 4
 			end
 
 			KTF.QuestButtonBar:SetHeight(questBtnBarHeight)
@@ -504,7 +504,8 @@ local function SetHooks()
 		end
 	end
 
-	local function SetQuestBarVisibility()
+	---Hide the quest button bar if there is not button or if the tracker is collapsed
+	local function RefreshQuestBarVisibility()
 		if dbChar.collapsed or KTF.QuestButtonBar.buttonCount == 0 then
 			KTF.QuestButtonBar:SetAlpha(0)
 		else
@@ -530,7 +531,7 @@ local function SetHooks()
 		bck_ObjectiveTracker_Update(reason, itemId)
 		KT:ToggleEmptyTracker(itemId)
 		RefreshQuestBar()
-		SetQuestBarVisibility()
+		RefreshQuestBarVisibility()
 		
 		if dbChar.collapsed then
 			local _, numQuests = GetNumQuestLogEntries()
@@ -833,7 +834,7 @@ local function SetHooks()
 				tag:ClearAllPoints()
 			else
 				tag = CreateFrame("Frame", nil, questBlock, "BackdropTemplate")
-				tag:SetSize(32, 32)
+				tag:SetSize(KT.QUEST_TAG.SIZE, KT.QUEST_TAG.SIZE)
 				tag:SetBackdrop({ bgFile = KT.MEDIA_PATH.."UI-KT-QuestItemTag" })
 				tag.text = tag:CreateFontString(nil, "ARTWORK", "GameFontNormalMed1")
 				tag.text:SetFont(LSM:Fetch("font", "Arial Narrow"), 13, "")
@@ -918,11 +919,11 @@ local function SetHooks()
 	local function RecycleOrCreateQuestButton(questID)
 		local button
 
-		local numFreeButtons = #freeButtons
-		if numFreeButtons > 0 then
+		local freeBtnCount = #questButtonPool
+		if freeBtnCount > 0 then
 			KT.Utils.Log("Use existing free button for quest : "..questID)
-			button = freeButtons[numFreeButtons]
-			tremove(freeButtons, numFreeButtons)
+			button = questButtonPool[freeBtnCount]
+			tremove(questButtonPool, freeBtnCount)
 		else
 			button = CreateQuestButton(questID)
 		end
@@ -1778,7 +1779,7 @@ function KT:RemoveQuestButton(questBlock)
 				combatLockdown = true
 			else
 				KT.Utils.Log(" - REMOVE button "..questID)
-				tinsert(freeButtons, button)
+				tinsert(questButtonPool, button)
 				self.questButtons[questID] = nil
 				button:Hide()
 				KTF.QuestButtonBar.shouldReanchor = true
@@ -1787,7 +1788,7 @@ function KT:RemoveQuestButton(questBlock)
 	else
 		for questID, button in pairs(self.questButtons) do
 			KT.Utils.Log(" - REMOVE button "..questID)
-			tinsert(freeButtons, button)
+			tinsert(questButtonPool, button)
 			self.questButtons[questID] = nil
 			button:Hide()
 		end
