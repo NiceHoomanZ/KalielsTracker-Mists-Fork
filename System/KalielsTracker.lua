@@ -426,18 +426,29 @@ end
 -- Hooks ---------------------------------------------------------------------------------------------------------------
 
 local function SetHooks()
-	local function SetFixedButton(questBlock, idx, height, yOfs)
-		if questBlock.fixedTag and KT.questButtons[questBlock.id] then
-
-			idx = idx + 1
-			questBlock.fixedTag.text:SetText(idx)
-			KT.questButtons[questBlock.id].text:SetText(idx)
-			KT.questButtons[questBlock.id].num = idx
-
-			yOfs = -(height + 7)
-			height = height + 26 + 3
-			KT.questButtons[questBlock.id]:SetPoint("TOP", 0, yOfs)
+	
+	---Set quest block text index, quest button text index and button Y offset from top
+	---@param questBlock Frame|any The associated quest block
+	---@param idx integer button index
+	---@param height integer
+	---@param yOfs integer button Y offset
+	---@return integer idx updated button index
+	---@return integer height updated height
+	---@return integer yOfs updated Y offset
+	local function SetupQuestButton(questBlock, idx, height, yOfs)
+		if not questBlock.fixedTag or not KT.questButtons[questBlock.id] then
+			return idx, height, yOfs
 		end
+
+		idx = idx + 1
+		questBlock.fixedTag.text:SetText(idx)
+		KT.questButtons[questBlock.id].text:SetText(idx)
+		KT.questButtons[questBlock.id].num = idx
+
+		yOfs = -(height + 7)
+		height = height + 26 + 3
+		KT.questButtons[questBlock.id]:SetPoint("TOP", 0, yOfs)
+
 		return idx, height, yOfs
 	end
 
@@ -459,17 +470,21 @@ local function SetHooks()
 				local questLogIndex = GetQuestIndexForWatch(i)
 				local questID = GetQuestIDFromLogIndex(questLogIndex)
 				local block = QUEST_TRACKER_MODULE.usedBlocks[questID]
+
 				if block and block.itemButton then
-					idx, contentsHeight, yOfs = SetFixedButton(block, idx, contentsHeight, yOfs)
+					idx, contentsHeight, yOfs = SetupQuestButton(block, idx, contentsHeight, yOfs)
 				end
 			end
+
 			if contentsHeight > 0 then
 				contentsHeight = contentsHeight + 7 + 4
 			end
+
 			KTF.QuestButtonBar:SetHeight(contentsHeight)
 			KTF.QuestButtonBar.num = idx
 			KTF.QuestButtonBar.reanchor = false
 		end
+
 		if dbChar.collapsed or KTF.QuestButtonBar.num == 0 then
 			KTF.QuestButtonBar:Hide()
 		else
