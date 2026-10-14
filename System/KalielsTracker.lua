@@ -223,6 +223,20 @@ end
 
 -- Frames --------------------------------------------------------------------------------------------------------------
 
+---@return KT.QuestButtonBar
+local function CreateQuestButtonBar()
+	local questButtonBar = CreateFrame("Frame", addonName.."_QuestButtonBar", UIParent, "BackdropTemplate")
+	questButtonBar:SetSize(KT.QUEST_BUTTON_BAR.SIZE, KT.QUEST_BUTTON_BAR.SIZE)
+	questButtonBar:SetPoint("TOPLEFT", 0, 0)
+	questButtonBar:SetFrameStrata(profile.frameStrata)
+	questButtonBar:SetFrameLevel(KTF:GetFrameLevel() - 1)
+	questButtonBar:SetAlpha(0)
+	questButtonBar.buttonCount = 0
+	questButtonBar.shouldRefresh = false
+
+	return questButtonBar
+end
+
 local function SetFrames()
 	-- Main frame
 	KTF:SetWidth(trackerWidth)
@@ -410,17 +424,7 @@ local function SetFrames()
 
 	-- Other buttons
 	KT:ToggleOtherButtons()
-
-	-- Buttons frame
-	local questButtonBar = CreateFrame("Frame", addonName.."_QuestButtonBar", UIParent, "BackdropTemplate")
-	questButtonBar:SetSize(KT.QUEST_BUTTON_BAR.SIZE, KT.QUEST_BUTTON_BAR.SIZE)
-	questButtonBar:SetPoint("TOPLEFT", 0, 0)
-	questButtonBar:SetFrameStrata(profile.frameStrata)
-	questButtonBar:SetFrameLevel(KTF:GetFrameLevel() - 1)
-	questButtonBar:SetAlpha(0)
-	questButtonBar.buttonCount = 0
-	questButtonBar.shouldRefresh = false
-	KTF.QuestButtonBar = questButtonBar
+	KTF.QuestButtonBar = CreateQuestButtonBar()
 end
 
 -- Hooks ---------------------------------------------------------------------------------------------------------------

@@ -5,7 +5,11 @@
 ---@field fixedTag Frame | BackdropTemplate
 ---@field itemButton KT.QuestButton
 
----@class KT.QuestButton: table, Button, SecureActionButtonTemplate Quest button item
+---@class KT.QuestButtonBar: Frame, BackdropTemplate
+---@field shouldRefresh boolean
+---@field buttonCount integer
+
+---@class KT.QuestButton: Button, SecureActionButtonTemplate Quest button item
 ---@field icon SimpleTexture
 ---@field Count SimpleFontString
 ---@field Cooldown table | Cooldown | CooldownFrameTemplate
