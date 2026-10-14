@@ -474,7 +474,6 @@ local function SetHooks()
 	---@param btnCount integer
 	---@param direction Direction
 	local function RefreshQuestBarSize(btnCount, direction)
-		-- TODO Reanchor bar according to direction
 		local lenght
 		if btnCount <= 0 then
 			lenght = 0
@@ -1484,7 +1483,7 @@ function KT:SetSize()
 			KTF:SetHeight(height)
 			KTF.height = height
 		end
-		self:MoveQuestButtonBar()
+		self:AnchorQuestButtonBar()
 	else
 		-- width
 		if profile.headerCollapsedTxt == 1 then
@@ -1528,7 +1527,7 @@ function KT:MoveTracker()
 	KTF.directionUp = (profile.anchorPoint == "BOTTOMLEFT" or profile.anchorPoint == "BOTTOMRIGHT")
 	KTF.anchorLeft = (profile.anchorPoint == "TOPLEFT" or profile.anchorPoint == "BOTTOMLEFT")
 
-	local options = self.options.args.general.args.sec1.args
+	local options = self.options.args.general.args.positionSection.args
 	if KTF.anchorLeft then
 		options.xOffset.min = 0
 		options.xOffset.max = self.screenWidth - trackerWidth
@@ -1548,7 +1547,7 @@ function KT:MoveTracker()
 	options.maxHeight.max = self.screenHeight - abs(profile.yOffset)
 	profile.maxHeight = (abs(profile.yOffset)+profile.maxHeight > self.screenHeight) and options.maxHeight.max or profile.maxHeight
 
-	self:MoveQuestButtonBar()
+	self:AnchorQuestButtonBar()
 end
 
 function KT:SetShown(show)
@@ -1758,7 +1757,7 @@ local function AnchorQuestBtnBarToScreen()
 	KTF.QuestButtonBar:SetPoint(localPoint, UIParent, "CENTER", profile.questBarXOffset, profile.questBarYOffset)
 end
 
-function KT:MoveQuestButtonBar()
+function KT:AnchorQuestButtonBar()
 	if InCombatLockdown() then return end
 
 	if not profile.anchorQuestBar then

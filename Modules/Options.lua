@@ -153,7 +153,7 @@ local options = {
 			name = "Options",
 			type = "group",
 			args = {
-				sec0 = {
+				infoSection = {
 					name = "Info",
 					type = "group",
 					inline = true,
@@ -229,7 +229,7 @@ local options = {
 						},
 					},
 				},
-				sec1 = {
+				positionSection = {
 					name = "Position / Size",
 					type = "group",
 					inline = true,
@@ -357,7 +357,7 @@ local options = {
 						},
 					},
 				},
-				sec2 = {
+				backgroundSection = {
 					name = "Background / Border",
 					type = "group",
 					inline = true,
@@ -404,7 +404,7 @@ local options = {
 							set = function(_, value)
 								profile.border = value
 								KT:SetBackground()
-								KT:MoveQuestButtonBar()
+								KT:AnchorQuestButtonBar()
 							end,
 							order = 2.3,
 						},
@@ -482,7 +482,7 @@ local options = {
 							set = function(_, value)
 								profile.bgrInset = value
 								KT:SetBackground()
-								KT:MoveQuestButtonBar()
+								KT:AnchorQuestButtonBar()
 							end,
 							order = 2.8,
 						},
@@ -499,7 +499,7 @@ local options = {
 						},
 					},
 				},
-				sec3 = {
+				textSection = {
 					name = "Texts",
 					type = "group",
 					inline = true,
@@ -824,7 +824,7 @@ local options = {
 					inline = true,
 					order = 5,
 					args = {
-							anchorToggle = {
+						anchorToggle = {
 							name = "Anchor to tracker",
 							desc = "Anchor the quest button bar to the quest tracker",
 							type = "toggle",
@@ -833,7 +833,7 @@ local options = {
 								profile.anchorQuestBar = not profile.anchorQuestBar
 								profile.questBarXOffset = 0
 								profile.questBarYOffset = 0
-								KT:MoveQuestButtonBar()
+								KT:AnchorQuestButtonBar()
 								OverlayFrameUpdate()
 								end,
 							order = 1.2,
@@ -852,7 +852,7 @@ local options = {
 							end,
 							set = function(_, key)
 								profile.buttonBarDirection = DIR_OPTIONS[key]
-								KT:MoveQuestButtonBar()
+								KT:AnchorQuestButtonBar()
 								KTF.QuestButtonBar.shouldRefresh = true
 								RefreshQuestBar()
 								OverlayFrameUpdate()
@@ -878,7 +878,7 @@ local options = {
 							end,
 							set = function(_, value)
 								profile.questBarXOffset = value
-								KT:MoveQuestButtonBar()
+								KT:AnchorQuestButtonBar()
 							end,
 							order = 2.1,
 						},
@@ -893,7 +893,7 @@ local options = {
 							end,
 							set = function(_, value)
 								profile.questBarYOffset = value
-								KT:MoveQuestButtonBar()
+								KT:AnchorQuestButtonBar()
 							end,
 							order = 2.2,
 						},
@@ -913,13 +913,13 @@ local options = {
 							set = function()
 								profile.enableQuestBarBackground = not profile.enableQuestBarBackground
 								KT:SetBackground()
-								KT:MoveQuestButtonBar()
+								KT:AnchorQuestButtonBar()
 							end,
 							order = 3,
 						},
 					},
 				},
-				sec6 = {
+				otherSection = {
 					name = "Other options",
 					type = "group",
 					inline = true,
@@ -991,7 +991,7 @@ local options = {
 						},
 					},
 				},
-				sec7 = {
+				notificationMessageSection = {
 					name = "Notification messages",
 					type = "group",
 					inline = true,
@@ -1498,11 +1498,11 @@ local function SetupOptionsMenu()
 
 	KT.SoundKits.AppendOptions(general.notificationSoundSection, profile)
 
-	general.sec2.args.classBorder.name = general.sec2.args.classBorder.name:format(KT.RgbToHex(KT.classColor))
+	general.backgroundSection.args.classBorder.name = general.backgroundSection.args.classBorder.name:format(KT.RgbToHex(KT.classColor))
 
-	general.sec7.args.messageOutput = KT:GetSinkAce3OptionsDataTable()
-	general.sec7.args.messageOutput.inline = true
-	general.sec7.args.messageOutput.disabled = function() return not (profile.messageQuest or profile.messageAchievement) end
+	general.notificationMessageSection.args.messageOutput = KT:GetSinkAce3OptionsDataTable()
+	general.notificationMessageSection.args.messageOutput.inline = true
+	general.notificationMessageSection.args.messageOutput.disabled = function() return not (profile.messageQuest or profile.messageAchievement) end
 	KT:SetSinkStorage(profile)
 
 	options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(KT.db)
@@ -1590,7 +1590,7 @@ local function SetupOptionsMenu()
 		addons.sec1.args.addonPetTrackerDesc = nil
 	end
 	if WOW_PROJECT_ID < WOW_PROJECT_WRATH_CLASSIC then
-		general.sec7.args.messageAchievement = nil
+		general.notificationMessageSection.args.messageAchievement = nil
 		profile.messageAchievement = false
 		content.sec2 = nil
 		profile.achievementsHeaderTitleAppend = false
