@@ -67,7 +67,7 @@ local defaults = {
 		maxHeight = 400,
 		frameScrollbar = true,
 		frameStrata = "LOW",
-		
+
 		bgr = "Solid",
 		bgrColor = { r = 0, g = 0, b = 0, a = 0.7 },
 		border = "None",
@@ -95,7 +95,7 @@ local defaults = {
 		headerCollapsedTxt = 3,
 		headerOtherButtons = true,
 		keyBindMinimize = "",
-		
+
 		questBarBtnBackgroundBorder = false,
 		anchorQuestBar = true,
 		questBarAnchor = "AUTO",
@@ -831,6 +831,7 @@ local options = {
 							name = "Show buttons block background and border",
 							type = "toggle",
 							width = "double",
+							get = function() return profile.questBarBtnBackgroundBorder end,
 							set = function()
 								profile.questBarBtnBackgroundBorder = not profile.questBarBtnBackgroundBorder
 								KT:SetBackground()
@@ -843,8 +844,8 @@ local options = {
 							desc = "Anchor the quest button bar to the quest tracker",
 							type = "toggle",
 							get = function () return profile.anchorQuestBar end,
-							set = function() 
-								profile.anchorQuestBar = not profile.anchorQuestBar 
+							set = function()
+								profile.anchorQuestBar = not profile.anchorQuestBar
 								profile.questBarXOffset = 0
 								profile.questBarYOffset = 0
 								KT:MoveQuestButtonBar()

@@ -861,7 +861,7 @@ local function SetHooks()
 		KT.Utils.Log("Create new quest button for quest: "..questID)
 		local name = addonName.."_QuestButton_"..questID
 		local button = CreateFrame("Button", name, KTF.QuestButtonBar, "SecureActionButtonTemplate")
-		button:SetSize(26, 26)
+		button:SetSize(KT.QUEST_BUTTON.SIZE, KT.QUEST_BUTTON.SIZE)
 
 		button.icon = button:CreateTexture(name.."_Icon", "BORDER")
 		button.icon:SetAllPoints()
