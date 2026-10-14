@@ -470,6 +470,28 @@ local function SetHooks()
 		PositionQuestButton(KT.questButtons[questBlock.id], index, direction)
 	end
 
+	---@param btnCount integer
+	---@param direction Direction
+	local function RefreshQuestBarSize(btnCount, direction)
+		-- TODO Compute length for horizontal and vertical orientation
+		-- TODO Reanchor bar according to direction
+		local lenght
+		if btnCount <= 0 then
+			lenght = 0
+		else
+			-- Space before + (N x (Button Size + Space After))
+			lenght = KT.QUEST_BUTTON.SPACING + (btnCount * (KT.QUEST_BUTTON.SIZE + KT.QUEST_BUTTON.SPACING))
+		end
+
+		if direction == "Up" or direction == "Down" then
+			KTF.QuestButtonBar:SetWidth(KT.QUEST_BUTTON_BAR.SIZE)
+			KTF.QuestButtonBar:SetHeight(lenght)
+		else
+			KTF.QuestButtonBar:SetWidth(lenght)
+			KTF.QuestButtonBar:SetHeight(KT.QUEST_BUTTON_BAR.SIZE)
+		end
+	end
+
 	---Resize quest button bar, 
 	---reanchor quest buttons, 
 	---toggle bar visibility, 
@@ -489,20 +511,14 @@ local function SetHooks()
 			local btnCount = #questBlocks
 
 			-- TODO Fetch direction from settings
+			---@type Direction
+			local direction = "Right"
+
 			for index, questBlock in ipairs(questBlocks) do
-				SetupQuestButton(questBlock, index, "Down")
+				SetupQuestButton(questBlock, index, direction)
 			end
 
-			-- TODO Compute length for horizontal and vertical orientation
-			-- TODO Reanchor bar according to direction
-			local lenght
-			if btnCount <= 0 then
-				lenght = 0
-			else
-				-- Space before + (N x (Button Size + Space After))
-				lenght = KT.QUEST_BUTTON.SPACING + (btnCount * (KT.QUEST_BUTTON.SIZE + KT.QUEST_BUTTON.SPACING))
-			end
-			KTF.QuestButtonBar:SetHeight(lenght)
+			RefreshQuestBarSize(btnCount, direction)
 			
 			KTF.QuestButtonBar.buttonCount = btnCount
 			KTF.QuestButtonBar.shouldRefresh = false
