@@ -1561,7 +1561,7 @@ function KT:SetBackground()
 		bgFile = LSM:Fetch("background", profile.bgr),
 		edgeFile = LSM:Fetch("border", profile.border),
 		edgeSize = profile.borderThickness,
-		insets = { left=profile.bgrInset, right=profile.bgrInset, top=profile.bgrInset, bottom=profile.bgrInset }
+		insets = { left=profile.backgroundInset, right=profile.backgroundInset, top=profile.backgroundInset, bottom=profile.backgroundInset }
 	}
 	self.borderColor = profile.classBorder and self.classColor or profile.borderColor
 
@@ -1754,11 +1754,11 @@ function KT:MoveQuestButtonBar()
 		xOfs = KTF:GetLeft() and KTF:GetLeft() - profile.questBarXOffset
 	end
 
-	local hMod = 2 * (4 - profile.bgrInset)
+	local hMod = 2 * (4 - profile.backgroundInset)
 	local yMod = 0
 	if not profile.enableQuestBarBackground then
 		hMod = hMod + 4
-		yMod = 2 + (4 - profile.bgrInset)
+		yMod = 2 + (4 - profile.backgroundInset)
 	end
 
 	if KTF.directionUp and (profile.maxHeight + hMod) < KTF.QuestButtonBar:GetHeight() then
@@ -1778,7 +1778,7 @@ function KT:MoveQuestButtonBar()
 	if xOfs and yOfs then
 		KTF.QuestButtonBar:ClearAllPoints()
 		KTF.QuestButtonBar:SetPoint(point, UIParent, parentAnchor, xOfs, yOfs)
-		end
+	end
 end
 
 function KT:RemoveQuestButton(questBlock)

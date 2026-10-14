@@ -5,3 +5,7 @@
 ---@field useRandomSoundKit boolean
 ---@field selectedSoundKits { [integer]: integer }
 ---@field buttonBarDirection Direction
+---@field anchorQuestBar boolean
+---@field questBarXOffset number
+---@field questBarYOffset number
+---@field enableQuestBarBackground boolean

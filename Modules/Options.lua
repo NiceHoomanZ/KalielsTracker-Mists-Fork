@@ -834,7 +834,7 @@ local options = {
 								KT:MoveQuestButtonBar()
 								OverlayFrameUpdate()
 								end,
-							order = 1.1,
+							order = 1.2,
 						},
 						buttonBarDirectionSelect = {
 							name = "Button bar direction",
@@ -855,8 +855,16 @@ local options = {
 								RefreshQuestBar()
 								OverlayFrameUpdate()
 							end,
-							order = 1.2,
+							order = 1.1,
 						},
+
+						space_1 = {
+							name = " ",
+							type = "description",
+							width = "full",
+							order = 2,
+						},
+
 						xOffsetRange = {
 							name = "X offset",
 							type = "range",
@@ -887,10 +895,18 @@ local options = {
 							end,
 							order = 2.2,
 						},
-						backgroundBorderToggle = {
-							name = "Show buttons block background",
+
+						space_2 = {
+							name = " ",
+							type = "description",
+							width = "full",
+							order = 3,
+						},
+
+						borderBackgroundBarToggle = {
+							name = "Show buttons bar border and background",
 							type = "toggle",
-							width = "double",
+							width = "full",
 							get = function() return profile.enableQuestBarBackground end,
 							set = function()
 								profile.enableQuestBarBackground = not profile.enableQuestBarBackground
