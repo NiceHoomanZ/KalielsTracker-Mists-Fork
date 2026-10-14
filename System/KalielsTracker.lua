@@ -1561,7 +1561,7 @@ function KT:SetBackground()
 		bgFile = LSM:Fetch("background", profile.bgr),
 		edgeFile = LSM:Fetch("border", profile.border),
 		edgeSize = profile.borderThickness,
-		insets = { left=profile.backgroundInset, right=profile.backgroundInset, top=profile.backgroundInset, bottom=profile.backgroundInset }
+		insets = { left=profile.bgrInset, right=profile.bgrInset, top=profile.bgrInset, bottom=profile.bgrInset }
 	}
 	self.borderColor = profile.classBorder and self.classColor or profile.borderColor
 
@@ -1741,10 +1741,31 @@ function KT:ToggleOtherButtons()
 	end
 end
 
+local function AnchorQuestBtnBarToScreen()
+	---@type FramePoint
+	local localPoint
+	if profile.buttonBarDirection == "Up" then
+		localPoint = "BOTTOM"
+	elseif profile.buttonBarDirection == "Down" then
+		localPoint = "TOP"
+	elseif profile.buttonBarDirection == "Left" then
+		localPoint = "RIGHT"
+	elseif profile.buttonBarDirection == "Right" then
+		localPoint = "LEFT"
+	end
+
+	KTF.QuestButtonBar:ClearAllPoints()
+	KTF.QuestButtonBar:SetPoint(localPoint, UIParent, "CENTER", profile.questBarXOffset, profile.questBarYOffset)
+end
+
 function KT:MoveQuestButtonBar()
 	if InCombatLockdown() then return end
 
-	local parentAnchor = "BOTTOMLEFT"
+	if not profile.anchorQuestBar then
+		AnchorQuestBtnBarToScreen()
+		return
+	end
+
 	local point, xOfs, yOfs
 	if KTF.anchorLeft then
 		point = "LEFT"
@@ -1754,11 +1775,11 @@ function KT:MoveQuestButtonBar()
 		xOfs = KTF:GetLeft() and KTF:GetLeft() - profile.questBarXOffset
 	end
 
-	local hMod = 2 * (4 - profile.backgroundInset)
+	local hMod = 2 * (4 - profile.bgrInset)
 	local yMod = 0
 	if not profile.enableQuestBarBackground then
 		hMod = hMod + 4
-		yMod = 2 + (4 - profile.backgroundInset)
+		yMod = 2 + (4 - profile.bgrInset)
 	end
 
 	if KTF.directionUp and (profile.maxHeight + hMod) < KTF.QuestButtonBar:GetHeight() then
@@ -1769,15 +1790,9 @@ function KT:MoveQuestButtonBar()
 		yOfs = KTF:GetTop() and KTF:GetTop() + yMod + profile.questBarYOffset
 	end
 
-	if not profile.anchorQuestBar then
-		xOfs = profile.questBarXOffset
-		yOfs = profile.questBarYOffset
-		parentAnchor = "CENTER"
-	end
-
 	if xOfs and yOfs then
 		KTF.QuestButtonBar:ClearAllPoints()
-		KTF.QuestButtonBar:SetPoint(point, UIParent, parentAnchor, xOfs, yOfs)
+		KTF.QuestButtonBar:SetPoint(point, UIParent, "BOTTOMLEFT", xOfs, yOfs)
 	end
 end
 

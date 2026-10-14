@@ -54,86 +54,88 @@ local _, numQuests = GetNumQuestLogEntries()
 
 local OverlayFrameUpdate, OverlayFrameHide, GetModulesOptionsTable, MoveModule, SetSharedColor	-- functions
 
+---@class KT.Profile
+local defaultProfile = {
+	anchorPoint = "TOPRIGHT",
+	xOffset = -115,
+	yOffset = -280,
+	maxHeight = 400,
+	frameScrollbar = true,
+	frameStrata = "LOW",
+
+	bgr = "Solid",
+	bgrColor = { r = 0, g = 0, b = 0, a = 0.7 },
+	border = "None",
+	borderColor = { r = 1, g = 0.82, b = 0 },
+	classBorder = false,
+	borderAlpha = 1,
+	borderThickness = 16,
+	bgrInset = 4,
+	progressBar = "Blizzard",
+
+	font = LSM:GetDefault("font"),
+	fontSize = 12,
+	fontFlag = "",
+	fontShadow = 1,
+	colorDifficulty = false,
+	textWordWrap = false,
+
+	headerBgr = 2,
+	headerBgrColor = { r = 1, g = 0.82, b = 0 },
+	headerBgrColorShare = false,
+	headerTxtColor = { r = 1, g = 0.82, b = 0 },
+	headerTxtColorShare = false,
+	headerBtnColor = { r = 1, g = 0.82, b = 0 },
+	headerBtnColorShare = false,
+	headerCollapsedTxt = 3,
+	headerOtherButtons = true,
+	keyBindMinimize = "",
+
+	enableQuestBarBackground = false,
+	anchorQuestBar = true,
+	buttonBarDirection = "Down",
+	questBarXOffset = -5,
+	questBarYOffset = 0,
+
+	hideEmptyTracker = false,
+	collapseInInstance = false,
+	expandTrackerAfterTrack = true,
+	menuWowheadURL = true,
+	menuWowheadURLModifier = "ALT",
+
+	messageQuest = true,
+	messageAchievement = true,
+	sink20OutputSink = "UIErrorsFrame",
+	sink20Sticky = false,
+	soundQuest = true,
+	soundQuestComplete = "KT - Default",
+	useSoundKit = false,
+	useRandomSoundKit = true,
+	selectedSoundKits = {},
+
+	questsHeaderTitleAppend = true,
+	questsShowLevels = true,
+	questsShowTags = true,
+	questsShowZones = true,
+	questsObjectiveNumSwitch = true,
+
+	achievementsHeaderTitleAppend = true,
+
+	tooltipShow = true,
+	tooltipShowRewards = true,
+	tooltipShowID = true,
+
+	pettrackerHeaderTitleAppend = true,
+
+	modulesOrder = KT.BLIZZARD_MODULES,
+
+	addonQuestie = false,
+	addonPetTracker = false,
+}
+
 ---@class DEFAULT_OPTIONS
----@field profile KT.Profile
 local defaults = {
-	profile = {
-		anchorPoint = "TOPRIGHT",
-		xOffset = -115,
-		yOffset = -280,
-		maxHeight = 400,
-		frameScrollbar = true,
-		frameStrata = "LOW",
-
-		bgr = "Solid",
-		bgrColor = { r = 0, g = 0, b = 0, a = 0.7 },
-		border = "None",
-		borderColor = { r = 1, g = 0.82, b = 0 },
-		classBorder = false,
-		borderAlpha = 1,
-		borderThickness = 16,
-		bgrInset = 4,
-		progressBar = "Blizzard",
-
-		font = LSM:GetDefault("font"),
-		fontSize = 12,
-		fontFlag = "",
-		fontShadow = 1,
-		colorDifficulty = false,
-		textWordWrap = false,
-
-		headerBgr = 2,
-		headerBgrColor = { r = 1, g = 0.82, b = 0 },
-		headerBgrColorShare = false,
-		headerTxtColor = { r = 1, g = 0.82, b = 0 },
-		headerTxtColorShare = false,
-		headerBtnColor = { r = 1, g = 0.82, b = 0 },
-		headerBtnColorShare = false,
-		headerCollapsedTxt = 3,
-		headerOtherButtons = true,
-		keyBindMinimize = "",
-
-		enableQuestBarBackground = false,
-		anchorQuestBar = true,
-		buttonBarDirection = "Down",
-		questBarXOffset = -5,
-		questBarYOffset = 0,
-
-		hideEmptyTracker = false,
-		collapseInInstance = false,
-		expandTrackerAfterTrack = true,
-		menuWowheadURL = true,
-        menuWowheadURLModifier = "ALT",
-
-		messageQuest = true,
-		messageAchievement = true,
-		sink20OutputSink = "UIErrorsFrame",
-		sink20Sticky = false,
-		soundQuest = true,
-		soundQuestComplete = "KT - Default",
-		useSoundKit = false,
-		useRandomSoundKit = true,
-		selectedSoundKits = {},
-
-		questsHeaderTitleAppend = true,
-		questsShowLevels = true,
-		questsShowTags = true,
-		questsShowZones = true,
-		questsObjectiveNumSwitch = true,
-
-		achievementsHeaderTitleAppend = true,
-
-		tooltipShow = true,
-		tooltipShowRewards = true,
-		tooltipShowID = true,
-
-		pettrackerHeaderTitleAppend = true,
-
-		modulesOrder = KT.BLIZZARD_MODULES,
-
-		addonQuestie = false,
-		addonPetTracker = false,
-	},
+	profile = defaultProfile,
 	char = {
 		collapsed = false,
 		quests = {
