@@ -4,6 +4,7 @@ local _, KT = ...
 QUEST_TRACKER_MODULE = ObjectiveTracker_GetModuleInfoTable();
 QUEST_TRACKER_MODULE.updateReasonModule = OBJECTIVE_TRACKER_UPDATE_MODULE_QUEST;
 QUEST_TRACKER_MODULE.updateReasonEvents = OBJECTIVE_TRACKER_UPDATE_QUEST + OBJECTIVE_TRACKER_UPDATE_QUEST_ADDED + OBJECTIVE_TRACKER_UPDATE_SUPER_TRACK_CHANGED;
+---@type KT.QuestBlock[]
 QUEST_TRACKER_MODULE.usedBlocks = { };
 
 QUEST_TRACKER_MODULE.buttonOffsets = {
@@ -38,20 +39,10 @@ function QUEST_TRACKER_MODULE:OnFreeTypedLine(line)
 		line.FadeOutAnim:Stop();
 	end
 end
-
-local function GetInlineFactionIcon()
-	local faction = UnitFactionGroup("player");
-	local coords = faction == "Horde" and QUEST_TAG_TCOORDS.HORDE or QUEST_TAG_TCOORDS.ALLIANCE;
-	return CreateTextureMarkup(QUEST_ICONS_FILE, QUEST_ICONS_FILE_WIDTH, QUEST_ICONS_FILE_HEIGHT, 16, 16
-	, coords[1]
-	, coords[2] - 0.02 -- Offset to stop bleeding from next image
-	, coords[3]
-	, coords[4], 0, 2);
-end
-function QUEST_TRACKER_MODULE:SetBlockHeader(block, text, questLogIndex, isQuestComplete, questID)
+function QUEST_TRACKER_MODULE:SetBlockHeader(block, text, questLogIndex, isQuestComplete)
 	QuestObjective_SetupHeader(block);
 
-	local hasGroupFinder = QuestObjectiveSetupBlockButton_FindGroup(block, questID);
+	local hasGroupFinder = QuestObjectiveSetupBlockButton_FindGroup();
 	local hasItem = QuestObjectiveSetupBlockButton_Item(block, questLogIndex, isQuestComplete);
 
 	-- Special case for previous behavior...if there are no buttons then use default line width from module

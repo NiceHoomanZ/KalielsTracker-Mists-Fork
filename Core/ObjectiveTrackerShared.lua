@@ -166,7 +166,7 @@ function QuestObjectiveSetupBlockButton_AddRightButton(block, button, initialAnc
 	block.lineWidth = block.lineWidth - button:GetWidth() - paddingBetweenButtons;
 end
 
-function QuestObjectiveSetupBlockButton_FindGroup(block, questID)
+function QuestObjectiveSetupBlockButton_FindGroup()
 	return false
 end
 

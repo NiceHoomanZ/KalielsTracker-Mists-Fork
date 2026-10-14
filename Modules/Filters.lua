@@ -555,15 +555,6 @@ local function DropDown_Filter_AchievCat_CheckAll(self, state)
 	end
 end
 
-local function GetInlineFactionIcon()
-	local coords = QUEST_TAG_TCOORDS[strupper(KT.playerFaction)]
-	return CreateTextureMarkup(QUEST_ICONS_FILE, QUEST_ICONS_FILE_WIDTH, QUEST_ICONS_FILE_HEIGHT, 22, 22
-		, coords[1]
-		, coords[2] - 0.02 -- Offset to stop bleeding from next image
-		, coords[3]
-		, coords[4])
-end
-
 function DropDown_Initialize(self, level)
 	local numEntries, numQuests = GetNumQuestLogEntries()
 	local info = MSA_DropDownMenu_CreateInfo()

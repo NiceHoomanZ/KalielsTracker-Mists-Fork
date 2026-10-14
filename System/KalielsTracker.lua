@@ -435,7 +435,7 @@ local function SetHooks()
 		KT.questButtons[questBlock.id].num = index
 	end
 
-	---Set quest block text index, quest button text index and button Y offset from top
+	---Set quest block text index, quest button text index and button position = Y offset from top
 	---@param questBlock KT.QuestBlock The associated quest block
 	---@param index integer button index
 	---@param questBarHeight integer cumulativ button bar's height
@@ -451,7 +451,7 @@ local function SetHooks()
 		index = index + 1
 		SetQuestIndexTexts(questBlock, index)
 
-		yOffset = -(questBarHeight + 7)
+		yOffset = -(questBarHeight + KT.QUEST_BUTTON.SPACING)
 		questBarHeight = questBarHeight + KT.QUEST_BUTTON.SIZE + 3
 		KT.questButtons[questBlock.id]:SetPoint("TOP", 0, yOffset)
 
@@ -479,6 +479,7 @@ local function SetHooks()
 			for i = 1, GetNumQuestWatches() do
 				local questLogIndex = GetQuestIndexForWatch(i)
 				local questID = GetQuestIDFromLogIndex(questLogIndex)
+
 				local questBlock = QUEST_TRACKER_MODULE.usedBlocks[questID]
 
 				if questBlock and questBlock.itemButton then
@@ -901,33 +902,20 @@ local function SetHooks()
 	end
 
 	---@param button KT.QuestButton
-	---@param isSpell boolean
-	local function BindEventOnQuestButton(button, isSpell)
-		if not isSpell then
-			button:SetScript("OnEvent", QuestObjectiveItem_OnEvent)
-			button:SetScript("OnUpdate", QuestObjectiveItem_OnUpdate)
-			button:SetScript("OnShow", QuestObjectiveItem_OnShow)
-			button:SetScript("OnHide", QuestObjectiveItem_OnHide)
-			button:SetScript("OnEnter", QuestObjectiveItem_OnEnter)
-			button:SetScript("OnLeave", QuestObjectiveItem_OnLeave)
-		else
-			button.HotKey:Hide()
-			button:SetScript("OnEvent", nil)
-			button:SetScript("OnUpdate", nil)
-			button:SetScript("OnShow", nil)
-			button:SetScript("OnHide", nil)
-			button:SetScript("OnEnter", ScenarioSpellButton_OnEnter)
-			button:SetScript("OnLeave", GameTooltip_Hide)
-		end
-
+	local function BindEventOnQuestButton(button)
+		button:SetScript("OnEvent", QuestObjectiveItem_OnEvent)
+		button:SetScript("OnUpdate", QuestObjectiveItem_OnUpdate)
+		button:SetScript("OnShow", QuestObjectiveItem_OnShow)
+		button:SetScript("OnHide", QuestObjectiveItem_OnHide)
+		button:SetScript("OnEnter", QuestObjectiveItem_OnEnter)
+		button:SetScript("OnLeave", QuestObjectiveItem_OnLeave)
 		button:SetScript("OnMouseDown", QuestObjectiveItem_OnClick)
-		button:SetAttribute("type*", isSpell and "spell" or "item")
+		button:SetAttribute("type*", "item")
 	end
 
 	---@param questID number
-	---@param isSpell boolean
 	---@return KT.QuestButton
-	local function RecycleOrCreateQuestButton(questID, isSpell)
+	local function RecycleOrCreateQuestButton(questID)
 		local button
 
 		local numFreeButtons = #freeButtons
@@ -939,16 +927,14 @@ local function SetHooks()
 			button = CreateQuestButton(questID)
 		end
 
-		BindEventOnQuestButton(button, isSpell)
+		BindEventOnQuestButton(button)
 
 		return button
 	end
 
-	---comment
 	---@param questBlock KT.QuestBlock
-	---@param isSpell boolean
-	---@return KT.QuestButton button
-	local function GetOrCreateQuestButton(questBlock, isSpell)
+	---@return KT.QuestButton? button
+	local function GetOrCreateQuestButton(questBlock)
 		local questID = questBlock.id
 		local button = KT:GetQuestButton(questID)
 		if not button then
@@ -958,7 +944,7 @@ local function SetHooks()
 				return nil
 			end
 
-			button = RecycleOrCreateQuestButton(questID, isSpell)
+			button = RecycleOrCreateQuestButton(questID)
 
 			button:Show()
 			KT.questButtons[questID] = button
@@ -977,14 +963,14 @@ local function SetHooks()
 
 	local bck_QUEST_TRACKER_MODULE_SetBlockHeader = QUEST_TRACKER_MODULE.SetBlockHeader
 	function QUEST_TRACKER_MODULE:SetBlockHeader(questBlock, text, questLogIndex, isQuestComplete, questID)
-		local _, level, suggestedGroup, _, _, _, frequency, _ = GetQuestLogTitle(questLogIndex)
+		local _, level, _, _, _, _, frequency, _ = GetQuestLogTitle(questLogIndex)
 		if profile.questsShowLevels then
 			text = KT:CreateQuestLevel(level)..text
 		end
 		questBlock.title = text
 		if profile.questsShowTags then
 			local tagID, _ = GetQuestTagInfo(questID)
-			text = text..KT:CreateQuestTag(tagID, frequency, suggestedGroup)
+			text = text..KT:CreateQuestTag(tagID, frequency)
 		end
 		bck_QUEST_TRACKER_MODULE_SetBlockHeader(self, questBlock, text, questLogIndex, isQuestComplete, questID)
 		questBlock.lineWidth = questBlock.lineWidth or self.lineWidth - 8		-- mod default
@@ -1826,7 +1812,7 @@ function KT:CreateQuestLevel(level)
 	return format("[%s] ", level)
 end
 
-function KT:CreateQuestTag(questTag, frequency, suggestedGroup)
+function KT:CreateQuestTag(questTag, frequency)
 	local tagIcons = ""
 	local texCoords
 	if questTag then

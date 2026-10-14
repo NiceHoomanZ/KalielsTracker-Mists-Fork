@@ -129,7 +129,8 @@ if WOW_PROJECT_ID < WOW_PROJECT_WRATH_CLASSIC then
     MAX_WATCHABLE_QUESTS = MAX_QUESTS
 end
 
---- Height and widht
+
 KT.QUEST_BUTTON = {
-    SIZE = 26
+    SIZE = 26, --- Height and width
+    SPACING = 7
 }
