@@ -473,7 +473,6 @@ local function SetHooks()
 	---@param btnCount integer
 	---@param direction Direction
 	local function RefreshQuestBarSize(btnCount, direction)
-		-- TODO Compute length for horizontal and vertical orientation
 		-- TODO Reanchor bar according to direction
 		local lenght
 		if btnCount <= 0 then
@@ -1776,11 +1775,7 @@ function KT:MoveQuestButtonBar()
 	if not profile.anchorQuestBar then
 		xOfs = profile.questBarXOffset
 		yOfs = profile.questBarYOffset
-		if profile.questBarAnchor == "AUTO" then
-			parentAnchor = "CENTER"
-		else
-			parentAnchor = profile.questBarAnchor
-		end
+		parentAnchor = "CENTER"
 	end
 
 	if xOfs and yOfs then

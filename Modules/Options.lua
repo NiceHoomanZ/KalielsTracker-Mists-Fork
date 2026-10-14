@@ -32,7 +32,6 @@ local profile
 
 local anchors = { "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT" }
 
-local QUEST_BAR_ANCHORS_OPTIONS = { "AUTO", "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "CENTER", "TOP", "BOTTOM", "LEFT", "RIGHT" }
 local SCREEN_HEIGHT = math.floor(GetScreenHeight())
 local SCREEN_WIDTH = math.floor(GetScreenWidth())
 
@@ -50,7 +49,7 @@ local warning = cWarning.."Warning:|r UI will be re-loaded!"
 local KTF = KT.frame
 local OTF = KT_ObjectiveTrackerFrame
 
-local overlay
+local trackerMaxHeightGizmo
 local overlayShown = false
 
 local _, numQuests = GetNumQuestLogEntries()
@@ -98,7 +97,6 @@ local defaults = {
 
 		questBarBtnBackgroundBorder = false,
 		anchorQuestBar = true,
-		questBarAnchor = "AUTO",
 		questBarXOffset = -5,
 		questBarYOffset = 0,
 
@@ -304,20 +302,18 @@ local options = {
 							desc = "Show overlay, for better visualisation Max. height value.",
 							type = "toggle",
 							width = 1.3,
-							get = function()
-								return overlayShown
-							end,
+							get = function() return overlayShown end,
 							set = function()
 								overlayShown = not overlayShown
-								if overlayShown and not overlay then
-									overlay = CreateFrame("Frame", KTF:GetName().."Overlay", KTF)
-									overlay:SetFrameLevel(KTF:GetFrameLevel() + 11)
-									overlay.texture = overlay:CreateTexture(nil, "BACKGROUND")
-									overlay.texture:SetAllPoints()
-									overlay.texture:SetColorTexture(0, 1, 0, 0.3)
+								if overlayShown and not trackerMaxHeightGizmo then
+									trackerMaxHeightGizmo = CreateFrame("Frame", KTF:GetName().."Overlay", KTF)
+									trackerMaxHeightGizmo:SetFrameLevel(KTF:GetFrameLevel() + 11)
+									trackerMaxHeightGizmo.texture = trackerMaxHeightGizmo:CreateTexture(nil, "BACKGROUND")
+									trackerMaxHeightGizmo.texture:SetAllPoints()
+									trackerMaxHeightGizmo.texture:SetColorTexture(0, 1, 0, 0.3)
 									OverlayFrameUpdate()
 								end
-								overlay:SetShown(overlayShown)
+								trackerMaxHeightGizmo:SetShown(overlayShown)
 							end,
 							order = 1.5,
 						},
@@ -853,27 +849,6 @@ local options = {
 								end,
 							order = 5.11,
 						},
-						anchorPoint = {
-							name = "Anchor point",
-							desc = "- Default: "..defaults.profile.questBarAnchor,
-							type = "select",
-							values = QUEST_BAR_ANCHORS_OPTIONS,
-							get = function()
-								for key, value in ipairs(QUEST_BAR_ANCHORS_OPTIONS) do
-									if profile.questBarAnchor == value then
-										return key
-									end
-								end
-							end,
-							set = function(_, value)
-								profile.questBarAnchor = QUEST_BAR_ANCHORS_OPTIONS[value]
-								profile.questBarXOffset = 0
-								profile.questBarYOffset = 0
-								KT:MoveQuestButtonBar()
-								OverlayFrameUpdate()
-							end,
-							order = 5.12,
-						},
 						xOffsetRange = {
 							name = "X offset",
 							type = "range",
@@ -1347,16 +1322,16 @@ SettingsPanel:HookScript("OnHide", function(self)
 end)
 
 function OverlayFrameUpdate()
-	if overlay then
-		overlay:SetSize(280, profile.maxHeight)
-		overlay:ClearAllPoints()
-		overlay:SetPoint(profile.anchorPoint, 0, 0)
+	if trackerMaxHeightGizmo then
+		trackerMaxHeightGizmo:SetSize(280, profile.maxHeight)
+		trackerMaxHeightGizmo:ClearAllPoints()
+		trackerMaxHeightGizmo:SetPoint(profile.anchorPoint, 0, 0)
 	end
 end
 
 function OverlayFrameHide()
 	if overlayShown then
-		overlay:Hide()
+		trackerMaxHeightGizmo:Hide()
 		overlayShown = false
 	end
 end
