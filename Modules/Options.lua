@@ -24,13 +24,11 @@ local pairs = pairs
 local strsplit = string.split
 local strsub = string.sub
 
----@class KT.Profile
----@field useSoundKit boolean
----@field useRandomSoundKit boolean
----@field selectedSoundKits { [integer]: integer }
 local profile
 
 local anchors = { "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT" }
+---@type Direction[]
+local DIR_OPTIONS = { "Up", "Down", "Left", "Right" }
 
 local SCREEN_HEIGHT = math.floor(GetScreenHeight())
 local SCREEN_WIDTH = math.floor(GetScreenWidth())
@@ -95,8 +93,9 @@ local defaults = {
 		headerOtherButtons = true,
 		keyBindMinimize = "",
 
-		questBarBtnBackgroundBorder = false,
+		enableQuestBarBackground = false,
 		anchorQuestBar = true,
+		buttonBarDirection = "Down",
 		questBarXOffset = -5,
 		questBarYOffset = 0,
 
@@ -823,19 +822,7 @@ local options = {
 					inline = true,
 					order = 5,
 					args = {
-						backgroundBorderToggle = {
-							name = "Show buttons block background and border",
-							type = "toggle",
-							width = "double",
-							get = function() return profile.questBarBtnBackgroundBorder end,
-							set = function()
-								profile.questBarBtnBackgroundBorder = not profile.questBarBtnBackgroundBorder
-								KT:SetBackground()
-								KT:MoveQuestButtonBar()
-							end,
-							order = 5.1,
-						},
-						anchorToggle = {
+							anchorToggle = {
 							name = "Anchor to tracker",
 							desc = "Anchor the quest button bar to the quest tracker",
 							type = "toggle",
@@ -847,7 +834,28 @@ local options = {
 								KT:MoveQuestButtonBar()
 								OverlayFrameUpdate()
 								end,
-							order = 5.11,
+							order = 1.1,
+						},
+						buttonBarDirectionSelect = {
+							name = "Button bar direction",
+							desc = "Define toward which direction the button bar will expand.",
+							type = "select",
+							values = DIR_OPTIONS,
+							get = function()
+								for key, dir in pairs(DIR_OPTIONS) do
+									if profile.buttonBarDirection == dir then
+										return key
+									end
+								end
+							end,
+							set = function(_, key)
+								profile.buttonBarDirection = DIR_OPTIONS[key]
+								KT:MoveQuestButtonBar()
+								KTF.QuestButtonBar.shouldRefresh = true
+								RefreshQuestBar()
+								OverlayFrameUpdate()
+							end,
+							order = 1.2,
 						},
 						xOffsetRange = {
 							name = "X offset",
@@ -862,7 +870,7 @@ local options = {
 								profile.questBarXOffset = value
 								KT:MoveQuestButtonBar()
 							end,
-							order = 5.2,
+							order = 2.1,
 						},
 						yOffsetRange = {
 							name = "Y offset",
@@ -877,8 +885,20 @@ local options = {
 								profile.questBarYOffset = value
 								KT:MoveQuestButtonBar()
 							end,
-							order = 5.3,
-						}
+							order = 2.2,
+						},
+						backgroundBorderToggle = {
+							name = "Show buttons block background",
+							type = "toggle",
+							width = "double",
+							get = function() return profile.enableQuestBarBackground end,
+							set = function()
+								profile.enableQuestBarBackground = not profile.enableQuestBarBackground
+								KT:SetBackground()
+								KT:MoveQuestButtonBar()
+							end,
+							order = 3,
+						},
 					},
 				},
 				sec6 = {

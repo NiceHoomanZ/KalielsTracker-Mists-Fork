@@ -458,6 +458,7 @@ local function SetHooks()
 			KT.Utils.LogError("Impossible to place quest button toward an incorect dicrection : "..direction)
 		end
 
+		btn:ClearAllPoints()
 		btn:SetPoint(toAnchor, btn:GetParent(), fromAnchor, xOffset, yOffset)
 	end
 
@@ -495,7 +496,7 @@ local function SetHooks()
 	---reanchor quest buttons, 
 	---toggle bar visibility, 
 	---update button count property
-	local function RefreshQuestBar()
+	function RefreshQuestBar()
 		if InCombatLockdown() then
 			if KTF.QuestButtonBar.buttonCount > 0 then
 				combatLockdown = true
@@ -504,20 +505,16 @@ local function SetHooks()
 		end
 
 		if KTF.QuestButtonBar.shouldRefresh then
-			KT.Utils.Log("Refresh quest button bar")
+			KT.Utils.Log("Refresh quest button bar size, button text and button position")
 
 			local questBlocks = QUEST_TRACKER_MODULE:GetQuestBlocksWithButton()
 			local btnCount = #questBlocks
 
-			-- TODO Fetch direction from settings
-			---@type Direction
-			local direction = "Right"
-
 			for index, questBlock in ipairs(questBlocks) do
-				SetupQuestButton(questBlock, index, direction)
+				SetupQuestButton(questBlock, index, profile.buttonBarDirection)
 			end
 
-			RefreshQuestBarSize(btnCount, direction)
+			RefreshQuestBarSize(btnCount, profile.buttonBarDirection)
 			
 			KTF.QuestButtonBar.buttonCount = btnCount
 			KTF.QuestButtonBar.shouldRefresh = false
@@ -1590,7 +1587,7 @@ function KT:SetBackground()
 		end
 	end
 
-	if profile.questBarBtnBackgroundBorder then
+	if profile.enableQuestBarBackground then
 		KTF.QuestButtonBar:SetBackdrop(backdrop)
 		KTF.QuestButtonBar:SetBackdropColor(profile.bgrColor.r, profile.bgrColor.g, profile.bgrColor.b, profile.bgrColor.a)
 		KTF.QuestButtonBar:SetBackdropBorderColor(self.borderColor.r, self.borderColor.g, self.borderColor.b, profile.borderAlpha)
@@ -1759,7 +1756,7 @@ function KT:MoveQuestButtonBar()
 
 	local hMod = 2 * (4 - profile.bgrInset)
 	local yMod = 0
-	if not profile.questBarBtnBackgroundBorder then
+	if not profile.enableQuestBarBackground then
 		hMod = hMod + 4
 		yMod = 2 + (4 - profile.bgrInset)
 	end
