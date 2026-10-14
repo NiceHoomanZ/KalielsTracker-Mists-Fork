@@ -849,8 +849,8 @@ local function SetHooks()
 	end
 
 	---Create quest button visual
-	---@param questID number
-	---@return table|Button|SecureActionButtonTemplate
+	---@param questID integer
+	---@return KT.QuestButton
 	local function CreateQuestButton(questID)
 		KT.Utils.Log("Create new quest button for quest: "..questID)
 		local name = addonName.."_QuestButton_"..questID
@@ -896,7 +896,7 @@ local function SetHooks()
 		return button;
 	end
 
-	---@param button table|Button
+	---@param button KT.QuestButton
 	---@param isSpell boolean
 	local function BindEventOnQuestButton(button, isSpell)
 		if not isSpell then
@@ -922,7 +922,7 @@ local function SetHooks()
 
 	---@param questID number
 	---@param isSpell boolean
-	---@return table|Button
+	---@return KT.QuestButton
 	local function RecycleOrCreateQuestButton(questID, isSpell)
 		local button
 
@@ -940,8 +940,12 @@ local function SetHooks()
 		return button
 	end
 
-	local function GetOrCreateQuestButton(block, isSpell)
-		local questID = block.id
+	---comment
+	---@param questBlock KT.QuestBlock
+	---@param isSpell boolean
+	---@return KT.QuestButton button
+	local function GetOrCreateQuestButton(questBlock, isSpell)
+		local questID = questBlock.id
 		local button = KT:GetQuestButton(questID)
 		if not button then
 			if InCombatLockdown() then
@@ -957,7 +961,7 @@ local function SetHooks()
 			KTF.QuestButtonBar.reanchor = true
 		end
 
-		button.block = block
+		button.block = questBlock
 		button:SetAlpha(1)
 
 		return button
