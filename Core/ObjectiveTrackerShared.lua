@@ -179,29 +179,31 @@ function QuestObjectiveReleaseBlockButton_FindGroup(block)
 	end
 end
 
-function QuestObjectiveSetupBlockButton_Item(block, questLogIndex, isQuestComplete)
+---@param questBlock KT.QuestBlock
+function QuestObjectiveSetupBlockButton_Item(questBlock, questLogIndex, isQuestComplete)
 	local _, item, _, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex);
 	local shouldShowItem = item and (not isQuestComplete or showItemWhenComplete);
 
 	if shouldShowItem then
-		local itemButton = block.itemButton;
+		local itemButton = questBlock.itemButton;
 		if not itemButton then
-			itemButton = QuestObjectiveItem_AcquireButton(block);
-			block.itemButton = itemButton;
+			itemButton = QuestObjectiveItem_AcquireButton(questBlock);
+			questBlock.itemButton = itemButton;
 		end
 
-		QuestObjectiveSetupBlockButton_AddRightButton(block, itemButton, block.module.buttonOffsets.useItem);
+		QuestObjectiveSetupBlockButton_AddRightButton(questBlock, itemButton, questBlock.module.buttonOffsets.useItem);
 	else
-		QuestObjectiveReleaseBlockButton_Item(block);
+		QuestObjectiveReleaseBlockButton_Item(questBlock);
 	end
 
 	return shouldShowItem;
 end
 
-function QuestObjectiveReleaseBlockButton_Item(block)
-	if block.itemButton then
-		QuestObjectiveItem_ReleaseButton(block.itemButton);
-		block.itemButton = nil;
+---@param questBlock KT.QuestBlock
+function QuestObjectiveReleaseBlockButton_Item(questBlock)
+	if questBlock.itemButton then
+		QuestObjectiveItem_ReleaseButton(questBlock.itemButton);
+		questBlock.itemButton = nil;
 	end
 end
 

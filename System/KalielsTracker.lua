@@ -36,7 +36,7 @@ local UIParent = UIParent
 
 local trackerWidth = 280
 local paddingBottom = 16
-local freeTags = {}
+local freeTagPool = {}
 local freeButtons = {}
 local msgPatterns = {}
 local combatLockdown = false
@@ -427,8 +427,8 @@ end
 
 local function SetHooks()
 	---Set quest block text index and quest button text index
-	---@param questBlock Frame|any The associated quest block
-	---@param index button index
+	---@param questBlock KT.QuestBlock The associated quest block
+	---@param index integer button index
 	local function SetQuestIndexTexts(questBlock, index)
 		questBlock.fixedTag.text:SetText(index)
 		KT.questButtons[questBlock.id].text:SetText(index)
@@ -436,7 +436,7 @@ local function SetHooks()
 	end
 
 	---Set quest block text index, quest button text index and button Y offset from top
-	---@param questBlock Frame|any The associated quest block
+	---@param questBlock KT.QuestBlock The associated quest block
 	---@param index integer button index
 	---@param questBarHeight integer cumulativ button bar's height
 	---@param yOfs integer button Y offset
@@ -468,26 +468,27 @@ local function SetHooks()
 
 		if KTF.QuestButtonBar.reanchor then
 			local yOfs
-			local idx = 0
-			local contentsHeight = 0
+			local questBtnIndex = 0
+			local questBtnBarHeight = 0
 			-- Quest items
 			KT.Utils.Log("Reanchor quest buttons")
 			for i = 1, GetNumQuestWatches() do
 				local questLogIndex = GetQuestIndexForWatch(i)
 				local questID = GetQuestIDFromLogIndex(questLogIndex)
-				local block = QUEST_TRACKER_MODULE.usedBlocks[questID]
+				local questBlock = QUEST_TRACKER_MODULE.usedBlocks[questID]
 
-				if block and block.itemButton then
-					idx, contentsHeight, yOfs = SetupQuestButton(block, idx, contentsHeight, yOfs)
+				if questBlock and questBlock.itemButton then
+					questBtnIndex, questBtnBarHeight, yOfs =
+						SetupQuestButton(questBlock, questBtnIndex, questBtnBarHeight, yOfs)
 				end
 			end
 
-			if contentsHeight > 0 then
-				contentsHeight = contentsHeight + 7 + 4
+			if questBtnBarHeight > 0 then
+				questBtnBarHeight = questBtnBarHeight + 7 + 4
 			end
 
-			KTF.QuestButtonBar:SetHeight(contentsHeight)
-			KTF.QuestButtonBar.num = idx
+			KTF.QuestButtonBar:SetHeight(questBtnBarHeight)
+			KTF.QuestButtonBar.num = questBtnIndex
 			KTF.QuestButtonBar.reanchor = false
 		end
 
@@ -815,30 +816,32 @@ local function SetHooks()
 		end
 	end)
 
-	local function CreateFixedTag(block, x, y, anchor)
-		local tag = block.fixedTag
+	---@param questBlock KT.QuestBlock
+	local function CreateFixedTag(questBlock, x, y, anchor)
+		local tag = questBlock.fixedTag
 		if not tag then
-			local numFreeButtons = #freeTags
-			if numFreeButtons > 0 then
-				tag = freeTags[numFreeButtons]
-				tremove(freeTags, numFreeButtons)
-				tag:SetParent(block)
+			local freeTagCount = #freeTagPool
+			if freeTagCount > 0 then
+				tag = freeTagPool[freeTagCount]
+				tremove(freeTagPool, freeTagCount)
+				tag:SetParent(questBlock)
 				tag:ClearAllPoints()
 			else
-				tag = CreateFrame("Frame", nil, block, "BackdropTemplate")
+				tag = CreateFrame("Frame", nil, questBlock, "BackdropTemplate")
 				tag:SetSize(32, 32)
 				tag:SetBackdrop({ bgFile = KT.MEDIA_PATH.."UI-KT-QuestItemTag" })
 				tag.text = tag:CreateFontString(nil, "ARTWORK", "GameFontNormalMed1")
 				tag.text:SetFont(LSM:Fetch("font", "Arial Narrow"), 13, "")
 				tag.text:SetPoint("CENTER", -0.5, 1)
 			end
-			tag:SetPoint(anchor or "TOPRIGHT", block, x, y)
+			
+			tag:SetPoint(anchor or "TOPRIGHT", questBlock, x, y)
 			tag:Show()
-			block.fixedTag = tag
+			questBlock.fixedTag = tag
 		end
 
 		local colorStyle = OBJECTIVE_TRACKER_COLOR["Normal"]
-		if block.isHighlighted and colorStyle.reverse then
+		if questBlock.isHighlighted and colorStyle.reverse then
 			colorStyle = colorStyle.reverse
 		end
 		tag:SetBackdropColor(colorStyle.r, colorStyle.g, colorStyle.b)
@@ -965,25 +968,25 @@ local function SetHooks()
 	end)
 
 	local bck_QUEST_TRACKER_MODULE_SetBlockHeader = QUEST_TRACKER_MODULE.SetBlockHeader
-	function QUEST_TRACKER_MODULE:SetBlockHeader(block, text, questLogIndex, isQuestComplete, questID)
+	function QUEST_TRACKER_MODULE:SetBlockHeader(questBlock, text, questLogIndex, isQuestComplete, questID)
 		local _, level, suggestedGroup, _, _, _, frequency, _ = GetQuestLogTitle(questLogIndex)
 		if profile.questsShowLevels then
 			text = KT:CreateQuestLevel(level)..text
 		end
-		block.title = text
+		questBlock.title = text
 		if profile.questsShowTags then
 			local tagID, _ = GetQuestTagInfo(questID)
 			text = text..KT:CreateQuestTag(tagID, frequency, suggestedGroup)
 		end
-		bck_QUEST_TRACKER_MODULE_SetBlockHeader(self, block, text, questLogIndex, isQuestComplete, questID)
-		block.lineWidth = block.lineWidth or self.lineWidth - 8		-- mod default
-		block.level = level
+		bck_QUEST_TRACKER_MODULE_SetBlockHeader(self, questBlock, text, questLogIndex, isQuestComplete, questID)
+		questBlock.lineWidth = questBlock.lineWidth or self.lineWidth - 8		-- mod default
+		questBlock.level = level
 
 		local link, item, charges, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex)
 		if item and (not isQuestComplete or showItemWhenComplete) then
-			block.itemButton:Hide()
-			CreateFixedTag(block, 3, 4)
-			local button = GetOrCreateQuestButton(block)
+			questBlock.itemButton:Hide()
+			CreateFixedTag(questBlock, 3, 4)
+			local button = GetOrCreateQuestButton(questBlock)
 			if not InCombatLockdown() then
 				button:SetID(questLogIndex)
 				button.charges = charges
@@ -996,7 +999,7 @@ local function SetHooks()
 				button:SetAttribute("item", link)
 			end
 		else
-			KT:RemoveQuestButton(block)
+			KT:RemoveQuestButton(questBlock)
 		end
 	end
 
@@ -1767,7 +1770,7 @@ function KT:RemoveQuestButton(questBlock)
 	if questBlock then
 		local tag = questBlock.fixedTag
 		if tag then
-			tinsert(freeTags, tag)
+			tinsert(freeTagPool, tag)
 			tag.text:SetText("")
 			tag:Hide()
 			questBlock.fixedTag = nil
