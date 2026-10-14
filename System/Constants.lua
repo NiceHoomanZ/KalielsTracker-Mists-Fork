@@ -4,8 +4,10 @@
 ---
 --- This file is part of addon Kaliel's Tracker.
 
----@type KT
-local addonName, KT = ...
+
+local addonName, addon = ...
+---@class KT
+local KT = addon
 
 -- Constants
 KT.TITLE = C_AddOns.GetAddOnMetadata(addonName, "Title")
@@ -126,3 +128,8 @@ OBJECTIVE_TRACKER_COLOR["ZoneHighlight"].reverse = OBJECTIVE_TRACKER_COLOR["Zone
 if WOW_PROJECT_ID < WOW_PROJECT_WRATH_CLASSIC then
     MAX_WATCHABLE_QUESTS = MAX_QUESTS
 end
+
+--- Height and widht
+KT.QUEST_BUTTON = {
+    SIZE = 26
+}

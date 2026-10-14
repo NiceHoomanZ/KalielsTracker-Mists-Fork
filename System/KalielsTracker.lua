@@ -250,7 +250,7 @@ local function SetFrames()
 			if not newStage then
 				local numSpells = ScenarioObjectiveBlock.numSpells or 0
 				for i = 1, numSpells do
-					KT:RemoveFixedButton(ScenarioObjectiveBlock.spells[i])
+					KT:RemoveQuestButton(ScenarioObjectiveBlock.spells[i])
 				end
 				ObjectiveTracker_Update(OBJECTIVE_TRACKER_UPDATE_SCENARIO)
 			end
@@ -271,7 +271,7 @@ local function SetFrames()
 			KT:SetAchievementsHeaderText()
 		elseif event == "PLAYER_REGEN_ENABLED" and combatLockdown then
 			combatLockdown = false
-			KT:RemoveFixedButton()
+			KT:RemoveQuestButton()
 			ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.COMBAT_STOP)
 		elseif event == "ZONE_CHANGED_NEW_AREA" or event == "ZONE_CHANGED" then
 			KTF.QuestButtonBar.reanchor = (KTF.QuestButtonBar.num > 0)
@@ -426,30 +426,36 @@ end
 -- Hooks ---------------------------------------------------------------------------------------------------------------
 
 local function SetHooks()
-	
+	---Set quest block text index and quest button text index
+	---@param questBlock Frame|any The associated quest block
+	---@param index button index
+	local function SetQuestIndexTexts(questBlock, index)
+		questBlock.fixedTag.text:SetText(index)
+		KT.questButtons[questBlock.id].text:SetText(index)
+		KT.questButtons[questBlock.id].num = index
+	end
+
 	---Set quest block text index, quest button text index and button Y offset from top
 	---@param questBlock Frame|any The associated quest block
-	---@param idx integer button index
-	---@param height integer
+	---@param index integer button index
+	---@param questBarHeight integer cumulativ button bar's height
 	---@param yOfs integer button Y offset
 	---@return integer idx updated button index
-	---@return integer height updated height
+	---@return integer questBarHeight updated height
 	---@return integer yOfs updated Y offset
-	local function SetupQuestButton(questBlock, idx, height, yOfs)
+	local function SetupQuestButton(questBlock, index, questBarHeight, yOfs)
 		if not questBlock.fixedTag or not KT.questButtons[questBlock.id] then
-			return idx, height, yOfs
+			return index, questBarHeight, yOfs
 		end
+		
+		index = index + 1
+		SetQuestIndexTexts(questBlock, index)
 
-		idx = idx + 1
-		questBlock.fixedTag.text:SetText(idx)
-		KT.questButtons[questBlock.id].text:SetText(idx)
-		KT.questButtons[questBlock.id].num = idx
-
-		yOfs = -(height + 7)
-		height = height + 26 + 3
+		yOfs = -(questBarHeight + 7)
+		questBarHeight = questBarHeight + KT.QUEST_BUTTON.SIZE + 3
 		KT.questButtons[questBlock.id]:SetPoint("TOP", 0, yOfs)
 
-		return idx, height, yOfs
+		return index, questBarHeight, yOfs
 	end
 
 	local function ReanchorQuestButtons()
@@ -519,6 +525,7 @@ local function SetHooks()
 		KT:ToggleEmptyTracker(itemId)
 		ReanchorQuestButtons()
 		SetQuestBarVisibility()
+		
 		if dbChar.collapsed then
 			local _, numQuests = GetNumQuestLogEntries()
 			local title = ""
@@ -932,7 +939,7 @@ local function SetHooks()
 
 	local function GetOrCreateQuestButton(block, isSpell)
 		local questID = block.id
-		local button = KT:GetFixedButton(questID)
+		local button = KT:GetQuestButton(questID)
 		if not button then
 			if InCombatLockdown() then
 				KT.Utils.LogWarning("Prevent creating quest button during combat !")
@@ -989,13 +996,13 @@ local function SetHooks()
 				button:SetAttribute("item", link)
 			end
 		else
-			KT:RemoveFixedButton(block)
+			KT:RemoveQuestButton(block)
 		end
 	end
 
 	local bck_QUEST_TRACKER_MODULE_OnFreeBlock = QUEST_TRACKER_MODULE.OnFreeBlock
 	function QUEST_TRACKER_MODULE:OnFreeBlock(block)
-		KT:RemoveFixedButton(block)
+		KT:RemoveQuestButton(block)
 		bck_QUEST_TRACKER_MODULE_OnFreeBlock(self, block)
 	end
 
@@ -1750,24 +1757,23 @@ function KT:MoveQuestButtonBar()
 		end
 	end
 
-
 	if xOfs and yOfs then
 		KTF.QuestButtonBar:ClearAllPoints()
 		KTF.QuestButtonBar:SetPoint(point, UIParent, parentAnchor, xOfs, yOfs)
 		end
 end
 
-function KT:RemoveFixedButton(block)
-	if block then
-		local tag = block.fixedTag
+function KT:RemoveQuestButton(questBlock)
+	if questBlock then
+		local tag = questBlock.fixedTag
 		if tag then
 			tinsert(freeTags, tag)
 			tag.text:SetText("")
 			tag:Hide()
-			block.fixedTag = nil
+			questBlock.fixedTag = nil
 		end
-		local questID = block.id
-		local button = self:GetFixedButton(questID)
+		local questID = questBlock.id
+		local button = self:GetQuestButton(questID)
 		if button then
 			button:SetAlpha(0)
 			if InCombatLockdown() then
@@ -1792,7 +1798,7 @@ function KT:RemoveFixedButton(block)
 	end
 end
 
-function KT:GetFixedButton(questID)
+function KT:GetQuestButton(questID)
 	if self.questButtons[questID] then
 		return self.questButtons[questID]
 	else
