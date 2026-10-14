@@ -274,7 +274,7 @@ local function SetFrames()
 			KT:RemoveQuestButton()
 			ObjectiveTracker_Update(DEBUG_UPDATE_REASONS.COMBAT_STOP)
 		elseif event == "ZONE_CHANGED_NEW_AREA" or event == "ZONE_CHANGED" then
-			KTF.QuestButtonBar.reanchor = (KTF.QuestButtonBar.num > 0)
+			KTF.QuestButtonBar.shouldReanchor = (KTF.QuestButtonBar.buttonCount > 0)
 		elseif event == "UPDATE_BINDINGS" then
 			KT:UpdateHotkey()
 		elseif event == "PLAYER_LEVEL_UP" then
@@ -418,8 +418,8 @@ local function SetFrames()
 	questButtonBar:SetFrameStrata(profile.frameStrata)
 	questButtonBar:SetFrameLevel(KTF:GetFrameLevel() - 1)
 	questButtonBar:SetAlpha(0)
-	questButtonBar.num = 0
-	questButtonBar.reanchor = false
+	questButtonBar.buttonCount = 0
+	questButtonBar.shouldReanchor = false
 	KTF.QuestButtonBar = questButtonBar
 end
 
@@ -439,36 +439,40 @@ local function SetHooks()
 	---@param questBlock KT.QuestBlock The associated quest block
 	---@param index integer button index
 	---@param questBarHeight integer cumulativ button bar's height
-	---@param yOfs integer button Y offset
+	---@param yOffset integer button Y offset
 	---@return integer idx updated button index
 	---@return integer questBarHeight updated height
 	---@return integer yOfs updated Y offset
-	local function SetupQuestButton(questBlock, index, questBarHeight, yOfs)
+	local function SetupQuestButton(questBlock, index, questBarHeight, yOffset)
 		if not questBlock.fixedTag or not KT.questButtons[questBlock.id] then
-			return index, questBarHeight, yOfs
+			return index, questBarHeight, yOffset
 		end
 		
 		index = index + 1
 		SetQuestIndexTexts(questBlock, index)
 
-		yOfs = -(questBarHeight + 7)
+		yOffset = -(questBarHeight + 7)
 		questBarHeight = questBarHeight + KT.QUEST_BUTTON.SIZE + 3
-		KT.questButtons[questBlock.id]:SetPoint("TOP", 0, yOfs)
+		KT.questButtons[questBlock.id]:SetPoint("TOP", 0, yOffset)
 
-		return index, questBarHeight, yOfs
+		return index, questBarHeight, yOffset
 	end
 
-	local function ReanchorQuestButtons()
+	---Resize quest button bar, 
+	---reanchor quest buttons, 
+	---toggle bar visibility, 
+	---update button count property
+	local function RefreshQuestBar()
 		if InCombatLockdown() then
-			if KTF.QuestButtonBar.num > 0 then
+			if KTF.QuestButtonBar.buttonCount > 0 then
 				combatLockdown = true
 			end
 			return
 		end
 
-		if KTF.QuestButtonBar.reanchor then
+		if KTF.QuestButtonBar.shouldReanchor then
 			local yOfs
-			local questBtnIndex = 0
+			local btnCount = 0
 			local questBtnBarHeight = 0
 			-- Quest items
 			KT.Utils.Log("Reanchor quest buttons")
@@ -478,8 +482,8 @@ local function SetHooks()
 				local questBlock = QUEST_TRACKER_MODULE.usedBlocks[questID]
 
 				if questBlock and questBlock.itemButton then
-					questBtnIndex, questBtnBarHeight, yOfs =
-						SetupQuestButton(questBlock, questBtnIndex, questBtnBarHeight, yOfs)
+					btnCount, questBtnBarHeight, yOfs =
+						SetupQuestButton(questBlock, btnCount, questBtnBarHeight, yOfs)
 				end
 			end
 
@@ -488,11 +492,11 @@ local function SetHooks()
 			end
 
 			KTF.QuestButtonBar:SetHeight(questBtnBarHeight)
-			KTF.QuestButtonBar.num = questBtnIndex
-			KTF.QuestButtonBar.reanchor = false
+			KTF.QuestButtonBar.buttonCount = btnCount
+			KTF.QuestButtonBar.shouldReanchor = false
 		end
 
-		if dbChar.collapsed or KTF.QuestButtonBar.num == 0 then
+		if dbChar.collapsed or KTF.QuestButtonBar.buttonCount == 0 then
 			KTF.QuestButtonBar:Hide()
 		else
 			KTF.QuestButtonBar:SetShown(not KT.locked)
@@ -500,7 +504,7 @@ local function SetHooks()
 	end
 
 	local function SetQuestBarVisibility()
-		if dbChar.collapsed or KTF.QuestButtonBar.num == 0 then
+		if dbChar.collapsed or KTF.QuestButtonBar.buttonCount == 0 then
 			KTF.QuestButtonBar:SetAlpha(0)
 		else
 			KTF.QuestButtonBar:SetAlpha(1)
@@ -524,7 +528,7 @@ local function SetHooks()
 
 		bck_ObjectiveTracker_Update(reason, itemId)
 		KT:ToggleEmptyTracker(itemId)
-		ReanchorQuestButtons()
+		RefreshQuestBar()
 		SetQuestBarVisibility()
 		
 		if dbChar.collapsed then
@@ -958,7 +962,7 @@ local function SetHooks()
 
 			button:Show()
 			KT.questButtons[questID] = button
-			KTF.QuestButtonBar.reanchor = true
+			KTF.QuestButtonBar.shouldReanchor = true
 		end
 
 		button.block = questBlock
@@ -1791,7 +1795,7 @@ function KT:RemoveQuestButton(questBlock)
 				tinsert(freeButtons, button)
 				self.questButtons[questID] = nil
 				button:Hide()
-				KTF.QuestButtonBar.reanchor = true
+				KTF.QuestButtonBar.shouldReanchor = true
 			end
 		end
 	else
@@ -1801,7 +1805,7 @@ function KT:RemoveQuestButton(questBlock)
 			self.questButtons[questID] = nil
 			button:Hide()
 		end
-		KTF.QuestButtonBar.reanchor = true
+		KTF.QuestButtonBar.shouldReanchor = true
 	end
 end
 
