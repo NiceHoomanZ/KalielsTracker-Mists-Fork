@@ -427,53 +427,57 @@ end
 
 local function SetHooks()
 	local function SetFixedButton(questBlock, idx, height, yOfs)
-		if questBlock.fixedTag and KT.fixedButtons[questBlock.id] then
+		if questBlock.fixedTag and KT.questButtons[questBlock.id] then
 
 			idx = idx + 1
 			questBlock.fixedTag.text:SetText(idx)
-			KT.fixedButtons[questBlock.id].text:SetText(idx)
-			KT.fixedButtons[questBlock.id].num = idx
+			KT.questButtons[questBlock.id].text:SetText(idx)
+			KT.questButtons[questBlock.id].num = idx
 
 			yOfs = -(height + 7)
 			height = height + 26 + 3
-			KT.fixedButtons[questBlock.id]:SetPoint("TOP", 0, yOfs)
+			KT.questButtons[questBlock.id]:SetPoint("TOP", 0, yOfs)
 		end
 		return idx, height, yOfs
 	end
 
-	local function FixedButtonsReanchor()
+	local function ReanchorQuestButtons()
 		if InCombatLockdown() then
 			if KTF.QuestButtonBar.num > 0 then
 				combatLockdown = true
 			end
-		else
-			if KTF.QuestButtonBar.reanchor then
-				local yOfs
-				local idx = 0
-				local contentsHeight = 0
-				-- Quest items
-				KT.Utils.Log("Reanchor quest buttons")
-				for i = 1, GetNumQuestWatches() do
-					local questLogIndex = GetQuestIndexForWatch(i)
-					local questID = GetQuestIDFromLogIndex(questLogIndex)
-					local block = QUEST_TRACKER_MODULE.usedBlocks[questID]
-					if block and block.itemButton then
-						idx, contentsHeight, yOfs = SetFixedButton(block, idx, contentsHeight, yOfs)
-					end
-				end
-				if contentsHeight > 0 then
-					contentsHeight = contentsHeight + 7 + 4
-				end
-				KTF.QuestButtonBar:SetHeight(contentsHeight)
-				KTF.QuestButtonBar.num = idx
-				KTF.QuestButtonBar.reanchor = false
-			end
-			if dbChar.collapsed or KTF.QuestButtonBar.num == 0 then
-				KTF.QuestButtonBar:Hide()
-			else
-				KTF.QuestButtonBar:SetShown(not KT.locked)
-			end
+			return
 		end
+
+		if KTF.QuestButtonBar.reanchor then
+			local yOfs
+			local idx = 0
+			local contentsHeight = 0
+			-- Quest items
+			KT.Utils.Log("Reanchor quest buttons")
+			for i = 1, GetNumQuestWatches() do
+				local questLogIndex = GetQuestIndexForWatch(i)
+				local questID = GetQuestIDFromLogIndex(questLogIndex)
+				local block = QUEST_TRACKER_MODULE.usedBlocks[questID]
+				if block and block.itemButton then
+					idx, contentsHeight, yOfs = SetFixedButton(block, idx, contentsHeight, yOfs)
+				end
+			end
+			if contentsHeight > 0 then
+				contentsHeight = contentsHeight + 7 + 4
+			end
+			KTF.QuestButtonBar:SetHeight(contentsHeight)
+			KTF.QuestButtonBar.num = idx
+			KTF.QuestButtonBar.reanchor = false
+		end
+		if dbChar.collapsed or KTF.QuestButtonBar.num == 0 then
+			KTF.QuestButtonBar:Hide()
+		else
+			KTF.QuestButtonBar:SetShown(not KT.locked)
+		end
+	end
+
+	local function SetQuestBarVisibility()
 		if dbChar.collapsed or KTF.QuestButtonBar.num == 0 then
 			KTF.QuestButtonBar:SetAlpha(0)
 		else
@@ -498,7 +502,8 @@ local function SetHooks()
 
 		bck_ObjectiveTracker_Update(reason, itemId)
 		KT:ToggleEmptyTracker(itemId)
-		FixedButtonsReanchor()
+		ReanchorQuestButtons()
+		SetQuestBarVisibility()
 		if dbChar.collapsed then
 			local _, numQuests = GetNumQuestLogEntries()
 			local title = ""
@@ -923,7 +928,7 @@ local function SetHooks()
 			button = RecycleOrCreateQuestButton(questID, isSpell)
 
 			button:Show()
-			KT.fixedButtons[questID] = button
+			KT.questButtons[questID] = button
 			KTF.QuestButtonBar.reanchor = true
 		end
 
@@ -1756,16 +1761,16 @@ function KT:RemoveFixedButton(block)
 			else
 				KT.Utils.Log(" - REMOVE button "..questID)
 				tinsert(freeButtons, button)
-				self.fixedButtons[questID] = nil
+				self.questButtons[questID] = nil
 				button:Hide()
 				KTF.QuestButtonBar.reanchor = true
 			end
 		end
 	else
-		for questID, button in pairs(self.fixedButtons) do
+		for questID, button in pairs(self.questButtons) do
 			KT.Utils.Log(" - REMOVE button "..questID)
 			tinsert(freeButtons, button)
-			self.fixedButtons[questID] = nil
+			self.questButtons[questID] = nil
 			button:Hide()
 		end
 		KTF.QuestButtonBar.reanchor = true
@@ -1773,8 +1778,8 @@ function KT:RemoveFixedButton(block)
 end
 
 function KT:GetFixedButton(questID)
-	if self.fixedButtons[questID] then
-		return self.fixedButtons[questID]
+	if self.questButtons[questID] then
+		return self.questButtons[questID]
 	else
 		return nil
 	end
@@ -1915,7 +1920,7 @@ function KT:OnInitialize()
 	self.headers = {}
 	self.borderColor = {}
 	self.headerBtnColor = {}
-	self.fixedButtons = {}
+	self.questButtons = {}
 	self.skinID = 0
 	self.inWorld = false
 	self.inInstance = IsInInstance()
