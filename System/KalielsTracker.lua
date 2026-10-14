@@ -1108,7 +1108,7 @@ local function SetHooks()
 
 		hooksecurefunc(AUTO_QUEST_POPUP_TRACKER_MODULE, "EndLayout", function(self)
 			for i = 1, GetNumAutoQuestPopUps() do
-				local questID, popUpType = GetAutoQuestPopUp(i)
+				local questID, _ = GetAutoQuestPopUp(i)
 				if not IsQuestBounty(questID) then
 					local questTitle = GetQuestLogTitle(GetQuestLogIndexByID(questID))
 					if questTitle and questTitle ~= "" then
@@ -1939,6 +1939,7 @@ function KT:OnInitialize()
 	self.headers = {}
 	self.borderColor = {}
 	self.headerBtnColor = {}
+	---@type KT.QuestButton[]
 	self.questButtons = {}
 	self.skinID = 0
 	self.inWorld = false
