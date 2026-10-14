@@ -472,3 +472,34 @@ function QUEST_TRACKER_MODULE:Update()
 	QuestPOI_HideUnusedButtons(KT_ObjectiveTrackerFrame.BlocksFrame);
 	QUEST_TRACKER_MODULE:EndLayout();
 end
+
+---The quests currently watched
+---@return integer[]
+local function GetWatchedQuestIds()
+	local questIds = {}
+	for i = 1, GetNumQuestWatches() do
+		local questLogIndex = GetQuestIndexForWatch(i)
+		local questID = GetQuestIDFromLogIndex(questLogIndex)
+		table.insert(questIds, questID)
+	end
+
+	return questIds
+end
+
+---The quest blocks using a quest button
+---@return KT.QuestBlock[]
+function QUEST_TRACKER_MODULE:GetQuestBlocksWithButton()
+	local questBlocks = {}
+	local questIds = GetWatchedQuestIds()
+	
+	for _, questId in ipairs(questIds) do
+		local questBlock = QUEST_TRACKER_MODULE.usedBlocks[questId]
+
+		if questBlock and questBlock.itemButton and
+			questBlock.fixedTag and KT.questButtons[questBlock.id] then
+			table.insert(questBlocks, questBlock)
+		end
+	end
+
+	return questBlocks
+end

@@ -459,29 +459,23 @@ local function SetHooks()
 		end
 
 		if KTF.QuestButtonBar.shouldReanchor then
-			KT.Utils.Log("Reanchor quest buttons")
+			KT.Utils.Log("Refresh quest button bar")
 
-			local btnCount = 0
-			for i = 1, GetNumQuestWatches() do
-				local questLogIndex = GetQuestIndexForWatch(i)
-				local questID = GetQuestIDFromLogIndex(questLogIndex)
+			local questBlocks = QUEST_TRACKER_MODULE:GetQuestBlocksWithButton()
+			local btnCount = #questBlocks
 
-				local questBlock = QUEST_TRACKER_MODULE.usedBlocks[questID]
-
-				if questBlock and questBlock.itemButton and questBlock.fixedTag and KT.questButtons[questBlock.id] then
-					btnCount = btnCount + 1
-					SetupQuestButton(questBlock, btnCount)
-				end
+			for index, questBlock in ipairs(questBlocks) do
+				SetupQuestButton(questBlock, index)
 			end
 
-			local questBtnBarHeight
+			local height
 			if btnCount <= 0 then
-				questBtnBarHeight = 0
+				height = 0
 			else
 				-- Space before + (N x (Button Size + Space After))
-				questBtnBarHeight = KT.QUEST_BUTTON.SPACING + (btnCount * (KT.QUEST_BUTTON.SIZE + KT.QUEST_BUTTON.SPACING))
+				height = KT.QUEST_BUTTON.SPACING + (btnCount * (KT.QUEST_BUTTON.SIZE + KT.QUEST_BUTTON.SPACING))
 			end
-			KTF.QuestButtonBar:SetHeight(questBtnBarHeight)
+			KTF.QuestButtonBar:SetHeight(height)
 			
 			KTF.QuestButtonBar.buttonCount = btnCount
 			KTF.QuestButtonBar.shouldReanchor = false
