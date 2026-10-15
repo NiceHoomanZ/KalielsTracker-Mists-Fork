@@ -1,7 +1,6 @@
 # Kaliel's Tracker Classic changelog
 
 ### 6.0.0
-
 - FIX - Quest item button now works properly
 - ADDED - Settings to change quest button bar : anchor, position and direction
 - ADDED - More sounds librairies to play when completing a quest
