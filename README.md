@@ -1,4 +1,4 @@
-# Kaliel's Tracker Fork for MoP Classic
+# Kaliel's Tracker Fork for WoW MoP Classic
 
 ## Disclaimer
 
@@ -9,7 +9,7 @@ I'm not the original author of this addon. I'm just contributing to fix it.
 - Functionnal quest item bar, with more options to position it.
 - More sounds to play on quest completion.
 
-See the section **6.0.0** of the [CHANGELOG](./!KalielsTracker/CHANGELOG.md).
+More info in the section **6.0.0** of the [CHANGELOG](!KalielsTracker/CHANGELOG.md).
 
 ## Tested Version
 
@@ -20,7 +20,7 @@ See the section **6.0.0** of the [CHANGELOG](./!KalielsTracker/CHANGELOG.md).
 
 ### Task
 
-The project contains a Visual Studio Code task that copy the content of this addon to WoW addon's folder. Be sure it's correctly setup to the relevant path on your computer in the *tasks.json* file.
+The project contains a Visual Studio Code task that copy the content of this addon to WoW addon's folder. Be sure it's correctly setup to the relevant path on your computer in the [*tasks.json*](.vscode/tasks.json) file.
 
 ### WoW Addon
 
@@ -29,6 +29,6 @@ The project contains a Visual Studio Code task that copy the content of this add
 
 ### VS Code extension
 
-- [Lua Language Server ](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
+- [Lua Language Server](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
 - [WoW API](https://marketplace.visualstudio.com/items?itemName=ketho.wow-api)
 - [WoW TOC](https://marketplace.visualstudio.com/items?itemName=stanzilla.vscode-wow-toc)
