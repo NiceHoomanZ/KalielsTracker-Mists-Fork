@@ -308,6 +308,12 @@ local function SetupTutorials()
 			headingSize = 26,
 			text = "If you like "..KT.TITLE..", consider supporting its development on Patreon "..ICON_HEART.."|r\n"..ebSpace.."\n"..
 
+					(cTitle.."Version 6.0.0|r\n"..
+					"- FIX - Quest item button now works properly\n"..
+					"- ADDED - Settings to change quest button bar : anchor, position and direction\n"..
+					"- ADDED - More sounds librairies to play when completing a quest\n"..
+					"\n")..
+			
 					(cTitle.."Version 5.3.0|r\n"..
 					"- ADDED - support for WoW 1.15.8.65300\n"..
 					"- ADDED - support for WoW 5.5.3.65302\n"..
