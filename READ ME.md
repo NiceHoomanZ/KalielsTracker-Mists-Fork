@@ -2,9 +2,18 @@
 
 ## Disclaimer
 
-I'm not the original author of this addon. I'm just contributing to fixing it.
+I'm not the original author of this addon. I'm just contributing to fix it.
+
+## Tested Version
+
+- Mist of Pandaria Classic 5.5.4.70032
+- - With and without Questie addon
 
 ## Development tools
+
+### Task
+
+The project contains a Visual Studio code task that copy the content of this addon to WoW addon folder. Be sure it's correctly setup to the relevant path on your computer in the *tasks.json* file.
 
 ### WoW Addon
 
@@ -16,8 +25,3 @@ I'm not the original author of this addon. I'm just contributing to fixing it.
 - [Lua Language Server ](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
 - [WoW API](https://marketplace.visualstudio.com/items?itemName=ketho.wow-api)
 - [WoW TOC](https://marketplace.visualstudio.com/items?itemName=stanzilla.vscode-wow-toc)
-
-## Tested Version
-
-- Mist of Pandaria Classic 5.5.4.70032
-- - With and without Questie addon
