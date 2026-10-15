@@ -1,6 +1,6 @@
 ## Interface: 20505
 ## Title: Kaliel's Tracker
-## Notes: |nTBC Classic Era Objective Tracker|n|cff999999by Kaliel (Marouan Sabbagh)|n|n
+## Notes: |nTBC Classic Era Objective Tracker|n|cff999999by Kaliel (Marouan Sabbagh) and Naokim|n|n
 ## Version: 6.0.0
 ## Author: Kaliel (Marouan Sabbagh) and Naokim
 ## IconTexture: Interface\Addons\!KalielsTracker\Media\KT_logo
