@@ -18,9 +18,13 @@ More info in the section **6.0.0** of the [CHANGELOG](!KalielsTracker/CHANGELOG.
 
 ## Development tools
 
+### Data
+
+A [.csv file](/Data/WoW%20Congratulations%20sound%20kits.csv) manually extracted from [Wowhead](https://www.wowhead.com/mop-classic) containing additionnal data about sound kit.
+
 ### Task
 
-The project contains a Visual Studio Code task that copy the content of this addon to WoW addon's folder. Be sure it's correctly setup to the relevant path on your computer in the [*tasks.json*](.vscode/tasks.json) file.
+A Visual Studio Code task that copy the content of this addon to WoW addon's folder. Be sure it's correctly setup to the relevant path on your computer in the [*tasks.json*](.vscode/tasks.json) file.
 
 ### WoW Addon
 
