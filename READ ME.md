@@ -20,3 +20,4 @@ I'm not the original author of this addon. I'm just contributing to fixing it.
 ## Tested Version
 
 - Mist of Pandaria Classic 5.5.4.70032
+- - With and without Questie addon

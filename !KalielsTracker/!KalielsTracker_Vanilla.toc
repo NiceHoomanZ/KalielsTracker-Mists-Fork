@@ -1,8 +1,8 @@
 ## Interface: 11508
 ## Title: Kaliel's Tracker
 ## Notes: |nClassic Era Objective Tracker|n|cff999999by Kaliel (Marouan Sabbagh)|n|n
-## Version: 5.3.0
-## Author: Kaliel (Marouan Sabbagh)
+## Version: 6.0.0
+## Author: Kaliel (Marouan Sabbagh) and Naokim
 ## IconTexture: Interface\Addons\!KalielsTracker\Media\KT_logo
 ## Category-enUS: Quests
 ## Category-deDE: Quests
