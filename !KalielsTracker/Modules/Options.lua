@@ -1024,6 +1024,7 @@ local options = {
 					args = {
 						soundQuest = {
 							name = "Quest sound",
+							desc = "Play a sound on quest completion",
 							type = "toggle",
 							set = function()
 								profile.soundQuest = not profile.soundQuest
@@ -1035,7 +1036,7 @@ local options = {
 							desc = "Addon sounds are prefixed \"KT - \".",
 							type = "select",
 							disabled = function()
-								return not profile.soundQuest
+								return not profile.soundQuest or profile.useSoundKit
 							end,
 							dialogControl = "LSM30_Sound",
 							values = WidgetLists.sound,

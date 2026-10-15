@@ -28,7 +28,7 @@ function KT.SoundKits.AppendOptions(section, profile)
         name = " ",
         type = "group",
         order = 8.3,
-        disabled = function () return not profile.useSoundKit end,
+        disabled = function () return not profile.soundQuest or not profile.useSoundKit end,
         args = {
             listenButton = {
                 name = "Listen",
