@@ -1,6 +1,3 @@
--- TODO Move the source csv to a folder external to the addon
--- TODO Update Changelog, version, TOC credit...
-
 local _, addon = ...
 ---@class KT
 local KT = addon
