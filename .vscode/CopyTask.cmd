@@ -1,6 +1,6 @@
 :: Copy all changes files, folders and sub-folder from "!KalielsTracker" directory to target.
 
-SET @addonDirectory="%cd%\!KalielsTracker-Mists"
+SET @addonDirectory="%cd%\!KalielsTracker_Mists"
 
 :: XO : Exclude files that are older, 
 :: PURGE : Remove non existing file in destination folder

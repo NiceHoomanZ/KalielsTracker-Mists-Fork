@@ -1,9 +1,9 @@
 ## Interface: 20505
-## Title: Kaliel's Tracker
+## Title: Kaliel's Tracker Mists
 ## Notes: |nTBC Classic Era Objective Tracker|n|cff999999by Kaliel (Marouan Sabbagh) and Naokim|n|n
 ## Version: 6.0.0
 ## Author: Kaliel (Marouan Sabbagh) and Naokim
-## IconTexture: Interface\Addons\!KalielsTracker\Media\KT_logo
+## IconTexture: Interface\Addons\!KalielsTracker_Mists\Media\KT_logo
 ## Category-enUS: Quests
 ## Category-deDE: Quests
 ## Category-esES: Misiones

@@ -1,9 +1,9 @@
-## Interface: 50503
-## Title: Kaliel's Tracker
-## Notes: |nMoP Classic Objective Tracker|n|cff999999by Kaliel (Marouan Sabbagh) and Naokim|n|n
+## Interface: 11508
+## Title: Kaliel's Tracker Mists
+## Notes: |nClassic Era Objective Tracker|n|cff999999by Kaliel (Marouan Sabbagh) and Naokim|n|n
 ## Version: 6.0.0
 ## Author: Kaliel (Marouan Sabbagh) and Naokim
-## IconTexture: Interface\Addons\!KalielsTracker\Media\KT_logo
+## IconTexture: Interface\Addons\!KalielsTracker_Mists\Media\KT_logo
 ## Category-enUS: Quests
 ## Category-deDE: Quests
 ## Category-esES: Misiones
@@ -18,9 +18,9 @@
 
 ## SavedVariables: KalielsTrackerDB
 ## Dependencies: Blizzard_UIWidgets
-## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibSink-2.0, MSA-DropDownMenu-1.0, Questie, PetTracker
+## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibSink-2.0, MSA-DropDownMenu-1.0, Questie
 
-Core\Core.xml
+Core\Core_Era.xml
 Libs\Libs.xml
 System\System.xml
-Modules\Modules.xml
+Modules\Modules_Vanilla.xml
