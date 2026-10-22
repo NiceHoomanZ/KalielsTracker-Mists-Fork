@@ -110,7 +110,7 @@ local defaultProfile = {
 	soundQuest = true,
 	soundQuestComplete = "KT - Default",
 	useSoundKit = false,
-	useRandomSoundKit = true,
+	useRandomSoundKit = false,
 	selectedSoundKits = {},
 
 	questsHeaderTitleAppend = true,
