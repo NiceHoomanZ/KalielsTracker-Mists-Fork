@@ -144,7 +144,7 @@ local defaultInitialAnchorOffsets = { 0, 0 };
 
 function QuestObjectiveSetupBlockButton_AddRightButton(block, button, initialAnchorOffsets)
 	if block.rightButton == button then
-		-- TODO: Fix for real, some event causes the findGroup button to get added twice (could happen for any button)
+		-- K TODO: Fix for real, some event causes the findGroup button to get added twice (could happen for any button)
 		-- so it doesn't need to be reanchored another time
 		return;
 	end
@@ -179,7 +179,7 @@ function QuestObjectiveReleaseBlockButton_FindGroup(block)
 	end
 end
 
--- TODO This whole thing is useless I think
+-- N TODO This seems to be unused
 ---@param questBlock KT.QuestBlock
 function QuestObjectiveSetupBlockButton_Item(questBlock, questLogIndex, isQuestComplete)
 	local _, item, _, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex);

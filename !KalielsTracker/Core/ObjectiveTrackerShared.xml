@@ -3,7 +3,7 @@
 
 	<Script file="ObjectiveTrackerShared.lua"/>
 
-	<!-- TODO Keep or remove the whole template / feature -->
+	<!-- N TODO This seems to be unused. Keep or remove the whole template / feature -->
 	<Button name="QuestObjectiveItemButtonTemplate" virtual="true">
 		<Size x="26" y="26"/>
 		<Layers>

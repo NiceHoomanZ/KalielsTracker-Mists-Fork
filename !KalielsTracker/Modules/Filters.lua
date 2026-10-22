@@ -423,7 +423,7 @@ local function Filter_Achievements(spec)
 												end
 											else
 												if strfind(aText, instanceDifficulty) or
-														(strfind(aText, "difficulty or higher")) then  -- TODO: other languages
+														(strfind(aText, "difficulty or higher")) then  -- K TODO: other languages
 													track = true
 												end
 											end
