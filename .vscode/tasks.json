@@ -12,7 +12,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "args": ["C:/Program Files (x86)/World of Warcraft/_classic_/Interface/AddOns/!KalielsTracker"],
+            "args": ["C:/Program Files (x86)/World of Warcraft/_classic_/Interface/AddOns/!KalielsTracker-Mists"],
             "presentation": {
                 "echo": false,
                 "reveal": "silent",
