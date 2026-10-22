@@ -1488,7 +1488,7 @@ function IsSpecialLocale()
 end
 
 local function Init()
-	KT.db = LibStub("AceDB-3.0"):New(strsub(addonName, 2).."DB", defaults, true)
+	KT.db = LibStub("AceDB-3.0"):New("KalielsTrackerDB_Mists", defaults, true)
 	KT.options = options
 	profile = KT.db.profile
 	dbChar = KT.db.char

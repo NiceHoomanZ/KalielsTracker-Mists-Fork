@@ -16,7 +16,7 @@
 ## Category-zhCN: 任务
 ## Category-zhTW: 任務
 
-## SavedVariables: KalielsTrackerDB
+## SavedVariables: KalielsTrackerDB_Mists
 ## Dependencies: Blizzard_UIWidgets
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibSink-2.0, MSA-DropDownMenu-1.0, Questie
 

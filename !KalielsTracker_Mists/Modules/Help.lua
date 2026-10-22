@@ -32,7 +32,7 @@ local cDots = "|cff808080"
 local offs = "\n|T:1:8|t"
 local ebSpace = "|T:16:1|t\n"
 
-local testedVersion = "5.5.3"
+local testedVersion = "5.5.4"
 local wowLogo = { w = 192, h = 47, x = -40, y = -29, c = { 0, 0.75, 0, 0.3671875 } }
 if WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
     testedVersion = "2.5.5"
