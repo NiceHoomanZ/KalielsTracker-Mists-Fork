@@ -4,7 +4,7 @@
 ---
 --- This file is part of addon Kaliel's Tracker.
 
-local addonName, addon = ...
+local _, addon = ...
 ---@class KT
 local KT = addon
 
@@ -31,8 +31,6 @@ local cWarning = "|cffff7f00"
 local cDots = "|cff808080"
 local offs = "\n|T:1:8|t"
 local ebSpace = "|T:16:1|t\n"
-local beta = "|cffff7fff[Beta]|r"
-local new = "|cffff7fff[NEW]|r"
 
 local testedVersion = "5.5.3"
 local wowLogo = { w = 192, h = 47, x = -40, y = -29, c = { 0, 0.75, 0, 0.3671875 } }
@@ -306,9 +304,7 @@ local function SetupTutorials()
 			heading = "     What's New",
 			headingFont = "Fonts\\MORPHEUS.ttf",
 			headingSize = 26,
-			text = "If you like "..KT.TITLE..", consider supporting its development on Patreon "..ICON_HEART.."|r\n"..ebSpace.."\n"..
-
-					(cTitle.."Version 6.0.0|r\n"..
+			text = (cTitle.."Version 6.0.0|r\n"..
 					"- FIX - Quest item button now works properly\n"..
 					"- ADDED - Settings to change quest button bar : anchor, position and direction\n"..
 					"- ADDED - More sounds librairies to play when completing a quest\n"..
@@ -336,25 +332,8 @@ local function SetupTutorials()
 					"- Header buttons Q and A don't work during combat.\n"..
 					"- Scenario Proving Grounds is not supported.\n\n"..
 
-					cTitle.."Issue reporting|r\n"..
-					"For reporting please use "..cBold.."Tickets|r instead of Comments on CurseForge.\n"..ebSpace.."\n"..
-
 					cWarning.."Before reporting of errors, please deactivate other addons and make sure the bug is not caused "..
 					"by a collision with another addon.|r",
-			editbox = {
-				{
-					icon = ICON_URL,
-					text = "https://patreon.com/kalielstracker",
-					width = 510,
-					top = 52,
-				},
-				{
-					icon = ICON_URL,
-					text = "https://www.curseforge.com/wow/addons/kaliels-tracker-classic/issues",
-					width = 510,
-					bottom = 40,
-				}
-			},
 			paddingBottom = 20,
 			shine = KTF,
 			shineTop = 5,
